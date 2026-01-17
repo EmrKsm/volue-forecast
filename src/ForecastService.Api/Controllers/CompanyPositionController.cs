@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ForecastService.Api.Controllers;
 
 [Route("api/[controller]")]
-public class CompanyPositionController(
-    ICompanyPositionService companyPositionService,
-    ILogger<CompanyPositionController> logger) : BaseApiController
+public class CompanyPositionController(ICompanyPositionService companyPositionService) : BaseApiController
 {
 
     /// <summary>
@@ -23,25 +21,13 @@ public class CompanyPositionController(
         [FromQuery] DateTime startDate,
         [FromQuery] DateTime endDate)
     {
-        try
-        {
-            var result = await companyPositionService.GetCompanyPositionAsync(companyId, startDate, endDate);
+        var result = await companyPositionService.GetCompanyPositionAsync(companyId, startDate, endDate);
 
-            if (result.IsFailure)
-            {
-                return HandleError(result);
-            }
-
-            return Ok(ApiResult<CompanyPositionResponse>.Ok(result.Value));
-        }
-        catch (Exception ex)
+        if (result.IsFailure)
         {
-            logger.LogError(ex, "Error retrieving company position for {CompanyId}", companyId);
-            return StatusCode(500, ApiResult<CompanyPositionResponse>.Fail(
-                "Internal Server Error",
-                "An error occurred while processing your request. Please try again later.",
-                StatusCodes.Status500InternalServerError,
-                HttpContext.Request.Path));
+            return HandleError(result);
         }
+
+        return Ok(ApiResult<CompanyPositionResponse>.Ok(result.Value));
     }
 }

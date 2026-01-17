@@ -1,3 +1,4 @@
+using ForecastService.Api.Middleware;
 using ForecastService.Application.Interfaces;
 using ForecastService.Application.Services;
 using ForecastService.Domain.Interfaces;
@@ -103,8 +104,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
-    app.UseDeveloperExceptionPage();
 }
+
+// Global exception handler (replaces UseDeveloperExceptionPage)
+app.UseGlobalExceptionHandler();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

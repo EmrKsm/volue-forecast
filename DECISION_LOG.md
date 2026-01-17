@@ -71,7 +71,7 @@
 
 **Azure Cloud Considerations:**
 - **Azure Database for PostgreSQL:** Fully managed service with automatic backups, patching, and HA
-- **Cost Efficiency:** Pay-per-use pricing with Burstable tier for development (~$15-30/month), General Purpose for production
+- **Cost Efficiency:** Pay-per-use pricing with Burstable tier for development, General Purpose for production
 - **Scalability:** Vertical scaling (vCores/memory) and horizontal read replicas without code changes
 - **Flexible Server:** Best balance of features, performance, and cost in Azure
 - **vs Azure SQL:** PostgreSQL offers lower licensing costs and open-source flexibility
@@ -141,12 +141,12 @@
 - Easy networking between containers
 
 **Azure Cloud Deployment Options:**
-- **Azure Container Apps:** Serverless containers with auto-scaling, pay-per-use (~$0.000012/vCPU-second)
+- **Azure Container Apps:** Serverless containers with auto-scaling, pay-per-use model
   - Cost-effective for variable workloads, scales to zero when idle
   - Built-in ingress, HTTPS, and microservices patterns
 - **Azure Kubernetes Service (AKS):** Full Kubernetes orchestration for complex workloads
   - More control but higher operational overhead
-  - Cost: ~$72/month for basic cluster + per-node charges
+  - Cluster-based pricing with per-node charges
 - **Azure Container Instances (ACI):** Simple container hosting
   - Lower cost for simple scenarios but limited features
 - **Recommendation:** Start with Container Apps for cost efficiency, migrate to AKS if complex orchestration needed
@@ -173,18 +173,18 @@
 **Azure Cloud Alternatives & Cost Comparison:**
 - **Azure Service Bus (Recommended for Azure):**
   - Fully managed, no infrastructure management
-  - Cost: Standard tier ~$10/month base + $0.05 per million operations
+  - Pricing: Standard tier with base monthly fee + per-operation charges
   - Enterprise features: Dead letter queues, duplicate detection, sessions
   - Better integration with Azure services (Managed Identity, Key Vault)
   - Lower operational overhead compared to self-hosted RabbitMQ
 
 - **Self-Hosted RabbitMQ on Azure Container Apps:**
   - More control but requires monitoring and maintenance
-  - Cost: Container hosting ~$20-40/month + storage
+  - Pricing: Container hosting fees + storage costs
   - Good for AMQP compatibility requirements
 
 - **Azure Event Grid:**
-  - Serverless event routing, pay-per-event ($0.60 per million operations)
+  - Serverless event routing, pay-per-event model
   - Best for event-driven architectures with multiple subscribers
   - Limited to push-based delivery (no pull/polling)
 
@@ -290,10 +290,11 @@ public record Error(string Code, string Message);
 - **Meaningful Messages:** Error codes (e.g., `PowerPlant.NotFound`) and descriptions
 
 **Benefits:**
-- No try-catch blocks in controllers
-- Automatic HTTP status code mapping
+- No try-catch blocks in controllers (global exception handler middleware)
+- Automatic HTTP status code mapping via Result Pattern
 - Clear error propagation through layers
 - Easy to test success and error paths
+- Centralized exception logging and formatting
 
 ---
 
