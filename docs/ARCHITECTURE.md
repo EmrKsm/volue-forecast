@@ -220,7 +220,7 @@ sequenceDiagram
     Repository-->>ForecastService: Forecast entity
     ForecastService->>EventPublisher: PublishPositionChangedEventAsync()
     EventPublisher-->>ForecastService: Event published
-    ForecastService-->>Controller: Result<ForecastResponse>
+    ForecastService-->>Controller: Result with ForecastResponse
     Controller-->>Client: ApiResult with 200 OK / 201 Created
 ```
 

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DECISION_LOG.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="technology-decision-log">Technology Decision Log</h1>
+<h2 id="project-forecast-service-microservice">Project: Forecast Service Microservice</h2>
+<p><strong>Date:</strong> January 18, 2026<br>
+<strong>Prepared for:</strong> Volue SmartPulse Technical Interview</p>
+<hr>
+<h2 id="1-framework--runtime">1. Framework &amp; Runtime</h2>
+<h3 id="decision-net-10-with-aspnet-core">Decision: .NET 10 with ASP.NET Core</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Modern Performance:</strong> .NET 10 offers excellent performance with minimal allocations and high throughput</li>
+<li><strong>Cross-Platform:</strong> Runs on Windows, Linux, and macOS, perfect for containerized deployments</li>
+<li><strong>Strong Typing:</strong> C# provides compile-time safety with latest language features</li>
+<li><strong>Async-First:</strong> Native async/await support for I/O-bound operations like database queries</li>
+<li><strong>Modern C# Features (Pragmatic Usage):</strong>
+<ul>
+<li><strong><code>field</code> keyword:</strong> Used in BaseEntity only for UTC timestamp normalization</li>
+<li>Applied to CreatedAt and UpdatedAt properties to eliminate explicit backing fields</li>
+<li>Limited scope - not used for validation (Data Annotations preferred)</li>
+</ul>
+</li>
+<li><strong>C# 14 Features Evaluated but Not Used:</strong>
+<ul>
+<li><strong>Extension Members:</strong> Only replaced <code>Sum()</code> which is already concise (overengineering)</li>
+<li><strong><code>Span&lt;T&gt;</code> optimizations:</strong> This is an I/O-bound microservice where network/database latency dominates</li>
+<li><strong><code>field</code> keyword for validation:</strong> Data Annotations provide better separation of concerns and ASP.NET Core integration</li>
+<li>Event publishing happens occasionally, not in tight loops requiring micro-optimizations</li>
+<li><strong>Principle:</strong> Prefer readability, maintainability, and framework conventions over premature optimization</li>
+</ul>
+</li>
+<li><strong>Enterprise Ready:</strong> Widely adopted in the energy and trading sectors</li>
+<li><strong>Long-term Support:</strong> Microsoft provides excellent support and regular updates</li>
+</ul>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>Node.js/TypeScript:</strong> Good for rapid development but less type-safe at compile time</li>
+<li><strong>Java/Spring Boot:</strong> Excellent choice but .NET 10 offers better performance metrics</li>
+<li><strong>Go:</strong> Great performance but smaller ecosystem for enterprise features</li>
+</ul>
+<hr>
+<h2 id="2-architecture-pattern">2. Architecture Pattern</h2>
+<h3 id="decision-clean-architecture-layered-architecture">Decision: Clean Architecture (Layered Architecture)</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Separation of Concerns:</strong> Clear boundaries between business logic, data access, and presentation</li>
+<li><strong>Testability:</strong> Each layer can be tested independently</li>
+<li><strong>Maintainability:</strong> Changes in one layer don't cascade to others</li>
+<li><strong>Dependency Inversion:</strong> Core business logic depends on abstractions, not implementations</li>
+<li><strong>Industry Standard:</strong> Well-understood pattern for microservices</li>
+<li><strong>Interview Requirement:</strong> Project specification explicitly requested layered structure</li>
+</ul>
+<p><strong>Layer Structure:</strong></p>
+<ol>
+<li><strong>Domain Layer:</strong> Core business entities and interfaces (no dependencies)</li>
+<li><strong>Application Layer:</strong> Business logic, services, and DTOs</li>
+<li><strong>Infrastructure Layer:</strong> Data access, repositories, external integrations</li>
+<li><strong>API Layer:</strong> Controllers, request/response handling, middleware</li>
+</ol>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>CQRS (Command Query Responsibility Segregation):</strong> Overkill for this scope</li>
+<li><strong>Event Sourcing:</strong> Too complex for the current requirements</li>
+<li><strong>Simple Three-Tier:</strong> Less flexible for future expansion</li>
+</ul>
+<hr>
+<h2 id="3-database">3. Database</h2>
+<h3 id="decision-postgresql-16">Decision: PostgreSQL 16</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Open Source:</strong> No licensing costs, widely supported</li>
+<li><strong>ACID Compliance:</strong> Ensures data consistency for financial/trading data</li>
+<li><strong>JSON Support:</strong> Can handle semi-structured data if needed in the future</li>
+<li><strong>Performance:</strong> Excellent query optimizer and indexing capabilities</li>
+<li><strong>Time-Series Extensions:</strong> TimescaleDB available for historical forecast analysis</li>
+<li><strong>Enterprise Adoption:</strong> Widely used in trading and energy sectors</li>
+<li><strong>Docker Support:</strong> Official Docker images with excellent documentation</li>
+</ul>
+<p><strong>Azure Cloud Considerations:</strong></p>
+<ul>
+<li><strong>Azure Database for PostgreSQL:</strong> Fully managed service with automatic backups, patching, and HA</li>
+<li><strong>Cost Efficiency:</strong> Pay-per-use pricing with Burstable tier for development, General Purpose for production</li>
+<li><strong>Scalability:</strong> Vertical scaling (vCores/memory) and horizontal read replicas without code changes</li>
+<li><strong>Flexible Server:</strong> Best balance of features, performance, and cost in Azure</li>
+<li><strong>vs Azure SQL:</strong> PostgreSQL offers lower licensing costs and open-source flexibility</li>
+</ul>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>SQL Server:</strong> Excellent but expensive licensing for microservices</li>
+<li><strong>MySQL:</strong> Good but PostgreSQL has better feature set for complex queries</li>
+<li><strong>MongoDB:</strong> Not ideal for transactional financial data requiring strong consistency</li>
+<li><strong>SQLite:</strong> Not suitable for production microservices</li>
+</ul>
+<hr>
+<h2 id="4-orm-object-relational-mapping">4. ORM (Object-Relational Mapping)</h2>
+<h3 id="decision-entity-framework-core-100">Decision: Entity Framework Core 10.0</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>First-Class Support:</strong> Native .NET integration with excellent tooling</li>
+<li><strong>Code-First Migrations:</strong> Easy database version control and deployment</li>
+<li><strong>LINQ Support:</strong> Type-safe queries with IntelliSense</li>
+<li><strong>Performance:</strong> Compiled queries and efficient change tracking</li>
+<li><strong>Provider Support:</strong> Excellent Npgsql provider for PostgreSQL</li>
+<li><strong>Async Operations:</strong> Full async/await support for non-blocking I/O</li>
+</ul>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>Dapper:</strong> Faster but more manual work, less suited for rapid development</li>
+<li><strong>NHibernate:</strong> Mature but EF Core is now performance-competitive</li>
+<li><strong>Raw ADO.NET:</strong> Too low-level for this project scope</li>
+</ul>
+<hr>
+<h2 id="5-repository-pattern">5. Repository Pattern</h2>
+<h3 id="decision-generic-repository-pattern-with-specific-implementations">Decision: Generic Repository Pattern with Specific Implementations</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Abstraction:</strong> Decouples business logic from data access technology</li>
+<li><strong>Testability:</strong> Easy to mock repositories for unit testing</li>
+<li><strong>Flexibility:</strong> Can switch data access strategies without changing business logic</li>
+<li><strong>Interview Alignment:</strong> Matches the requested layered architecture</li>
+<li><strong>Single Responsibility:</strong> Each repository handles one aggregate root</li>
+</ul>
+<p><strong>Implementation:</strong></p>
+<ul>
+<li>Interface definitions in Domain layer</li>
+<li>Concrete implementations in Infrastructure layer</li>
+<li>Scoped lifetime for thread safety</li>
+</ul>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>Direct DbContext Usage:</strong> Less flexible, harder to test</li>
+<li><strong>Unit of Work Pattern:</strong> Added complexity not needed for this scope</li>
+</ul>
+<hr>
+<h2 id="6-containerization">6. Containerization</h2>
+<h3 id="decision-docker-with-docker-compose">Decision: Docker with Docker Compose</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Environment Consistency:</strong> Same runtime everywhere (dev, test, prod)</li>
+<li><strong>Easy Setup:</strong> Single command to start entire application stack</li>
+<li><strong>Isolation:</strong> Database and API run in separate containers</li>
+<li><strong>Industry Standard:</strong> Docker is widely used for microservices</li>
+<li><strong>Orchestration Ready:</strong> Easy migration to Kubernetes if needed</li>
+<li><strong>Multi-Stage Builds:</strong> Optimized image sizes (SDK for build, Runtime for deployment)</li>
+</ul>
+<p><strong>Docker Compose Benefits:</strong></p>
+<ul>
+<li>PostgreSQL and API defined together</li>
+<li>Health checks ensure database is ready before API starts</li>
+<li>Persistent volumes for database data</li>
+<li>Easy networking between containers</li>
+</ul>
+<p><strong>Azure Cloud Deployment Options:</strong></p>
+<ul>
+<li><strong>Azure Container Apps:</strong> Serverless containers with auto-scaling, pay-per-use model
+<ul>
+<li>Cost-effective for variable workloads, scales to zero when idle</li>
+<li>Built-in ingress, HTTPS, and microservices patterns</li>
+</ul>
+</li>
+<li><strong>Azure Kubernetes Service (AKS):</strong> Full Kubernetes orchestration for complex workloads
+<ul>
+<li>More control but higher operational overhead</li>
+<li>Cluster-based pricing with per-node charges</li>
+</ul>
+</li>
+<li><strong>Azure Container Instances (ACI):</strong> Simple container hosting
+<ul>
+<li>Lower cost for simple scenarios but limited features</li>
+</ul>
+</li>
+<li><strong>Recommendation:</strong> Start with Container Apps for cost efficiency, migrate to AKS if complex orchestration needed</li>
+</ul>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>Virtual Machines:</strong> Too heavy, slower startup</li>
+<li><strong>No Containerization:</strong> Difficult environment management</li>
+<li><strong>Kubernetes Directly:</strong> Overkill for development/demo purposes</li>
+</ul>
+<hr>
+<h2 id="7-event-publishing">7. Event Publishing</h2>
+<h3 id="decision-rabbitmq-message-broker">Decision: RabbitMQ Message Broker</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Reliability:</strong> Message persistence, delivery guarantees, and automatic reconnection</li>
+<li><strong>Standards-Based:</strong> AMQP protocol with wide client support</li>
+<li><strong>Management UI:</strong> Built-in monitoring at http://localhost:15672 for message inspection</li>
+<li><strong>Docker Integration:</strong> Official Docker image with easy compose configuration</li>
+<li><strong>Battle-Tested:</strong> Proven in high-throughput environments</li>
+<li><strong>Decoupling:</strong> Asynchronous event processing for downstream systems</li>
+<li><strong>Scalability:</strong> Supports clustering and message routing patterns</li>
+</ul>
+<p><strong>Azure Cloud Alternatives &amp; Cost Comparison:</strong></p>
+<ul>
+<li>
+<p><strong>Azure Service Bus (Recommended for Azure):</strong></p>
+<ul>
+<li>Fully managed, no infrastructure management</li>
+<li>Pricing: Standard tier with base monthly fee + per-operation charges</li>
+<li>Enterprise features: Dead letter queues, duplicate detection, sessions</li>
+<li>Better integration with Azure services (Managed Identity, Key Vault)</li>
+<li>Lower operational overhead compared to self-hosted RabbitMQ</li>
+</ul>
+</li>
+<li>
+<p><strong>Self-Hosted RabbitMQ on Azure Container Apps:</strong></p>
+<ul>
+<li>More control but requires monitoring and maintenance</li>
+<li>Pricing: Container hosting fees + storage costs</li>
+<li>Good for AMQP compatibility requirements</li>
+</ul>
+</li>
+<li>
+<p><strong>Azure Event Grid:</strong></p>
+<ul>
+<li>Serverless event routing, pay-per-event model</li>
+<li>Best for event-driven architectures with multiple subscribers</li>
+<li>Limited to push-based delivery (no pull/polling)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Trade-offs:</strong></p>
+<ul>
+<li>RabbitMQ chosen for demo: portable, self-contained, no cloud dependency</li>
+<li>Azure Service Bus recommended for production: managed service, lower TCO, enterprise features</li>
+</ul>
+<p><strong>Implementation Details:</strong></p>
+<ul>
+<li><strong>Exchange:</strong> <code>forecast.events</code> (topic exchange)</li>
+<li><strong>Routing Key:</strong> <code>position.changed</code></li>
+<li><strong>Connection:</strong> Automatic reconnection with retry logic</li>
+<li><strong>Message Format:</strong> JSON serialized events</li>
+<li><strong>Publisher:</strong> <code>RabbitMqEventPublisher</code> in Infrastructure layer</li>
+</ul>
+<p><strong>Interface Design:</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IEventPublisher</span>
+{
+    <span class="hljs-function">Task <span class="hljs-title">PublishPositionChangedEventAsync</span>(<span class="hljs-params">PositionChangedEvent eventData</span>)</span>;
+}
+</div></code></pre>
+<p><strong>Alternative Options Considered:</strong></p>
+<ul>
+<li><strong>In-Memory Publisher:</strong> Simple but no inter-service communication</li>
+<li><strong>Apache Kafka:</strong> High throughput but complex setup for this scope</li>
+<li><strong>AWS EventBridge:</strong> Cloud-native but vendor lock-in</li>
+</ul>
+<hr>
+<h2 id="8-api-design">8. API Design</h2>
+<h3 id="decision-restful-api-with-scalar-openapi-documentation">Decision: RESTful API with Scalar (OpenAPI Documentation)</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Industry Standard:</strong> REST is universally understood and supported</li>
+<li><strong>HTTP Semantics:</strong> Proper use of status codes (200, 201, 400, 404, 500)</li>
+<li><strong>Modern Documentation:</strong> Scalar provides a superior UI experience compared to Swagger</li>
+<li><strong>OpenAPI 3.0:</strong> Standards-compliant API specification</li>
+<li><strong>Tooling:</strong> Excellent client generation tools (TypeScript, C#, etc.)</li>
+<li><strong>Idempotency:</strong> POST operations handle upsert logic gracefully</li>
+<li><strong>.NET 10 Native:</strong> Built-in OpenAPI support without Swashbuckle dependency</li>
+</ul>
+<p><strong>Endpoint Design Philosophy:</strong></p>
+<ul>
+<li>Resource-based URLs (<code>/api/forecasts</code>, <code>/api/companyposition</code>)</li>
+<li>Proper HTTP verbs (POST for create/update, GET for retrieval)</li>
+<li>Query parameters for filtering (startDate, endDate)</li>
+<li><strong>ApiResult Pattern:</strong> Consistent <code>success</code>, <code>data</code>, <code>error</code> response structure</li>
+<li>Proper error handling with meaningful messages and error codes</li>
+</ul>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>GraphQL:</strong> Flexible but overkill for this simple API</li>
+<li><strong>gRPC:</strong> Better performance but REST more accessible for demo</li>
+<li><strong>Swagger UI:</strong> Standard but Scalar offers better UX</li>
+</ul>
+<hr>
+<h2 id="9-concurrency--thread-safety">9. Concurrency &amp; Thread Safety</h2>
+<h3 id="decision-scoped-dbcontext-with-asyncawait-pattern">Decision: Scoped DbContext with Async/Await Pattern</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Thread Safety:</strong> Each HTTP request gets its own DbContext instance</li>
+<li><strong>No Shared State:</strong> Repositories are scoped, preventing race conditions</li>
+<li><strong>Async I/O:</strong> Non-blocking operations for better scalability</li>
+<li><strong>Connection Pooling:</strong> Npgsql manages connection pooling automatically</li>
+<li><strong>Scalability:</strong> Stateless design allows horizontal scaling</li>
+</ul>
+<p><strong>Implementation Details:</strong></p>
+<ul>
+<li>All repository methods are async</li>
+<li>DbContext registered with Scoped lifetime</li>
+<li>No static shared state</li>
+<li>Each request is isolated</li>
+</ul>
+<hr>
+<h2 id="10-data-validation--error-handling">10. Data Validation &amp; Error Handling</h2>
+<h3 id="decision-result-pattern-with-multi-layer-validation">Decision: Result Pattern with Multi-Layer Validation</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Type Safety:</strong> Explicit success/failure handling without exceptions</li>
+<li><strong>Performance:</strong> No exception overhead for business rule violations</li>
+<li><strong>Functional Style:</strong> Clear separation between success and error paths</li>
+<li><strong>Controller Level:</strong> Model validation using data annotations</li>
+<li><strong>Service Level:</strong> Business rule validation (e.g., negative production values)</li>
+<li><strong>Database Level:</strong> Constraints ensure data integrity</li>
+<li><strong>Consistent Errors:</strong> Domain errors centralized in <code>DomainErrors</code> class</li>
+</ul>
+<p><strong>Result Pattern Implementation:</strong></p>
+<pre class="hljs"><code><div><span class="hljs-keyword">public</span> record Result&lt;T&gt;
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">bool</span> IsSuccess { <span class="hljs-keyword">get</span>; init; }
+    <span class="hljs-keyword">public</span> T? Value { <span class="hljs-keyword">get</span>; init; }
+    <span class="hljs-keyword">public</span> Error? Error { <span class="hljs-keyword">get</span>; init; }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">public</span> record <span class="hljs-title">Error</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> Code, <span class="hljs-keyword">string</span> Message</span>)</span>;
+</div></code></pre>
+<p><strong>Error Response Strategy:</strong></p>
+<ul>
+<li><strong>400 Bad Request:</strong> Invalid input or business rule violations (domain errors)</li>
+<li><strong>404 Not Found:</strong> Resource doesn't exist</li>
+<li><strong>409 Conflict:</strong> Concurrency or constraint violations</li>
+<li><strong>500 Internal Server Error:</strong> Unexpected errors (logged)</li>
+<li><strong>Meaningful Messages:</strong> Error codes (e.g., <code>PowerPlant.NotFound</code>) and descriptions</li>
+</ul>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>No try-catch blocks in controllers (global exception handler middleware)</li>
+<li>Automatic HTTP status code mapping via Result Pattern</li>
+<li>Clear error propagation through layers</li>
+<li>Easy to test success and error paths</li>
+<li>Centralized exception logging and formatting</li>
+</ul>
+<hr>
+<h2 id="11-logging--monitoring">11. Logging &amp; Monitoring</h2>
+<h3 id="decision-serilog-for-structured-logging">Decision: Serilog for Structured Logging</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Structured Logging:</strong> Rich context with property-based logging</li>
+<li><strong>Multiple Sinks:</strong> Console (development) + File (persistent logs)</li>
+<li><strong>Performance:</strong> Efficient with minimal overhead</li>
+<li><strong>Configuration:</strong> Flexible via code and appsettings.json</li>
+<li><strong>Request Logging:</strong> HTTP request/response details with timing</li>
+<li><strong>Log Enrichment:</strong> Automatic context injection (timestamp, level, source)</li>
+</ul>
+<p><strong>Current Implementation:</strong></p>
+<ul>
+<li><strong>Console Sink:</strong> Real-time output during development with color coding</li>
+<li><strong>File Sink:</strong> Daily rolling logs in <code>logs/forecast-service-YYYYMMDD.log</code></li>
+<li><strong>Retention:</strong> 30-day automatic cleanup</li>
+<li><strong>Log Levels:</strong> Debug (app), Information (Microsoft), Information (EF Core)</li>
+<li><strong>Format:</strong> Structured JSON-like output with context</li>
+</ul>
+<p><strong>Example Log Output:</strong></p>
+<pre class="hljs"><code><div>[2026-01-17 10:30:45 INF] ForecastService.Application.Services.ForecastService
+Creating forecast for PowerPlant: 22222222..., DateTime: 2026-01-18T10:00:00Z
+
+[2026-01-17 10:30:45 INF] ForecastService.Infrastructure.Events.RabbitMqEventPublisher
+Published Position Changed Event to RabbitMQ: CompanyId=11111111..., TotalPosition=850.5 MWh
+</div></code></pre>
+<p><strong>Future Enhancements:</strong></p>
+<ul>
+<li>Correlation IDs for distributed request tracing</li>
+<li>Application Insights or ELK stack for centralized logging</li>
+<li>Structured JSON sink for log aggregation</li>
+<li>Performance metrics and custom event tracking</li>
+</ul>
+<hr>
+<h2 id="12-input-validation-strategy">12. Input Validation Strategy</h2>
+<h3 id="decision-aspnet-core-data-annotations-with-nullable-types">Decision: ASP.NET Core Data Annotations with Nullable Types</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Framework Integration:</strong> Automatic validation before controller action execution</li>
+<li><strong>Declarative Approach:</strong> Clear, readable validation rules on properties</li>
+<li><strong>Consistent Error Format:</strong> Custom <code>InvalidModelStateResponseFactory</code> for uniform responses</li>
+<li><strong>Type Safety:</strong> Nullable value types (<code>Guid?</code>, <code>DateTime?</code>, <code>decimal?</code>) with <code>[Required]</code> ensure proper validation</li>
+<li><strong>Separation of Concerns:</strong> Validation logic separate from business logic and property setters</li>
+<li><strong>Standard Pattern:</strong> Industry-standard ASP.NET Core approach</li>
+</ul>
+<p><strong>Implementation:</strong></p>
+<pre class="hljs"><code><div><span class="hljs-comment">// DTOs with nullable properties and validation attributes</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CreateOrUpdateForecastRequest</span>
+{
+    [<span class="hljs-meta">Required(ErrorMessage = <span class="hljs-meta-string">"Power plant ID is required"</span>)</span>]
+    <span class="hljs-keyword">public</span> Guid? PowerPlantId { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [<span class="hljs-meta">Required(ErrorMessage = <span class="hljs-meta-string">"Forecast date and time is required"</span>)</span>]
+    <span class="hljs-keyword">public</span> DateTime? ForecastDateTime { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+
+    [<span class="hljs-meta">Required(ErrorMessage = <span class="hljs-meta-string">"Production value is required"</span>)</span>]
+    [<span class="hljs-meta">Range(0, double.MaxValue, ErrorMessage = <span class="hljs-meta-string">"Production value must be non-negative"</span>)</span>]
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">decimal</span>? ProductionMWh { <span class="hljs-keyword">get</span>; <span class="hljs-keyword">set</span>; }
+}
+
+<span class="hljs-comment">// Controller parameters also validated</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;ActionResult&gt; <span class="hljs-title">GetForecast</span>(<span class="hljs-params">
+    [Required(ErrorMessage = <span class="hljs-string">"Forecast ID is required"</span></span>)] Guid? id)
+</span></div></code></pre>
+<p><strong>Custom Error Response Configuration:</strong></p>
+<pre class="hljs"><code><div>builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =&gt;
+    {
+        options.InvalidModelStateResponseFactory = context =&gt;
+        {
+            <span class="hljs-keyword">var</span> errors = context.ModelState
+                .Where(e =&gt; e.Value?.Errors.Count &gt; <span class="hljs-number">0</span>)
+                .SelectMany(e =&gt; e.Value!.Errors)
+                .Select(e =&gt; e.ErrorMessage);
+
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> BadRequestObjectResult(<span class="hljs-keyword">new</span> {
+                success = <span class="hljs-literal">false</span>,
+                data = <span class="hljs-literal">null</span>,
+                error = <span class="hljs-keyword">new</span> {
+                    title = <span class="hljs-string">"Validation Error"</span>,
+                    detail = <span class="hljs-keyword">string</span>.Join(<span class="hljs-string">"; "</span>, errors),
+                    status = <span class="hljs-number">400</span>,
+                    instance = context.HttpContext.Request.Path,
+                    timestamp = DateTime.UtcNow
+                }
+            });
+        };
+    });
+</div></code></pre>
+<p><strong>Evolution from Initial Approach:</strong></p>
+<ul>
+<li><strong>Initial:</strong> Used C# 14 <code>field</code> keyword with <code>ArgumentException</code> in property setters</li>
+<li><strong>Problem:</strong> Exceptions thrown during model binding before middleware could catch them</li>
+<li><strong>Solution:</strong> Nullable types with Data Annotations - validated automatically by ASP.NET Core</li>
+<li><strong>Benefits:</strong>
+<ul>
+<li>No custom middleware needed for validation errors</li>
+<li>Consistent with ASP.NET Core conventions</li>
+<li>Clear separation: validation (annotations) vs domain logic (services)</li>
+<li>Better error messages returned as 400 Bad Request, not 500 Internal Server Error</li>
+</ul>
+</li>
+</ul>
+<p><strong>Error Response Format:</strong></p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"success"</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">"data"</span>: <span class="hljs-literal">null</span>,
+  <span class="hljs-attr">"error"</span>: {
+    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"Validation Error"</span>,
+    <span class="hljs-attr">"detail"</span>: <span class="hljs-string">"Power plant ID is required; Production value must be non-negative"</span>,
+    <span class="hljs-attr">"status"</span>: <span class="hljs-number">400</span>,
+    <span class="hljs-attr">"instance"</span>: <span class="hljs-string">"/api/forecasts"</span>,
+    <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">"2026-01-18T10:30:45Z"</span>
+  }
+}
+</div></code></pre>
+<p><strong>Alternatives Considered:</strong></p>
+<ul>
+<li><strong>FluentValidation:</strong> More powerful but unnecessary for simple validation rules</li>
+<li><strong>Custom Middleware:</strong> Catches exceptions but validation should happen earlier in pipeline</li>
+<li><strong>Field Keyword Validation:</strong> Elegant but throws during model binding, inconsistent HTTP status codes</li>
+</ul>
+<hr>
+<h2 id="13-development--deployment">13. Development &amp; Deployment</h2>
+<h3 id="decision-visual-studio-code-friendly-with-net-cli">Decision: Visual Studio Code-Friendly with .NET CLI</h3>
+<p><strong>Rationale:</strong></p>
+<ul>
+<li><strong>Cross-Platform:</strong> Works on any OS</li>
+<li><strong>Lightweight:</strong> Fast development experience</li>
+<li><strong>CLI First:</strong> All operations scriptable</li>
+<li><strong>CI/CD Ready:</strong> Easy integration with GitHub Actions, Azure DevOps</li>
+</ul>
+<p><strong>Build &amp; Run:</strong></p>
+<pre class="hljs"><code><div>dotnet build
+dotnet run
+docker-compose up
+</div></code></pre>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>The technology choices prioritize:</p>
+<ol>
+<li><strong>Enterprise Patterns:</strong> RabbitMQ, Serilog, Result Pattern, Docker</li>
+<li><strong>Maintainability:</strong> Clean architecture with clear separation</li>
+<li><strong>Scalability:</strong> Stateless design, containerization, async operations</li>
+<li><strong>Developer Experience:</strong> Modern tooling, Scalar API docs, structured logging</li>
+<li><strong>Interview Alignment:</strong> Exceeds all specified requirements</li>
+<li><strong>Industry Best Practices:</strong> Patterns used in real trading platforms</li>
+<li><strong>Error Handling:</strong> Type-safe Result Pattern without exception overhead</li>
+<li><strong>Observability:</strong> Serilog with multiple sinks, RabbitMQ management UI</li>
+</ol>
+<p>These decisions balance <strong>pragmatism</strong> (efficient development) with <strong>professionalism</strong> (enterprise architecture), demonstrating both technical competence and architectural maturity suitable for an energy trading platform microservice. The implementation goes beyond basic requirements to showcase enterprise-grade patterns including event-driven architecture, structured logging, and functional error handling.</p>
+
+</body>
+</html>

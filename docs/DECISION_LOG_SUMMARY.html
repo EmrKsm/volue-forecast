@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DECISION_LOG_SUMMARY.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="technology-decision-log---executive-summary">Technology Decision Log - Executive Summary</h1>
+<p><strong>Project:</strong> Forecast Service Microservice<br>
+<strong>Date:</strong> January 18, 2026<br>
+<strong>Prepared for:</strong> Volue SmartPulse Technical Interview</p>
+<hr>
+<h2 id="core-technology-stack">Core Technology Stack</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Key Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Framework</strong></td>
+<td>.NET 10 / ASP.NET Core</td>
+<td>High performance, cross-platform, async-first, enterprise-ready with excellent Azure integration</td>
+</tr>
+<tr>
+<td><strong>Language</strong></td>
+<td>C# with modern features</td>
+<td>Strong typing, compile-time safety, pragmatic use of <code>field</code> keyword for UTC normalization in BaseEntity</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>PostgreSQL 16</td>
+<td>Open-source, ACID compliance, excellent performance, Azure Database for PostgreSQL available</td>
+</tr>
+<tr>
+<td><strong>ORM</strong></td>
+<td>Entity Framework Core 10.0</td>
+<td>Code-first migrations, LINQ support, async operations, excellent Npgsql provider</td>
+</tr>
+<tr>
+<td><strong>Message Broker</strong></td>
+<td>RabbitMQ 3.13</td>
+<td>Reliable event publishing, management UI, AMQP standard (Azure Service Bus recommended for production)</td>
+</tr>
+<tr>
+<td><strong>Containerization</strong></td>
+<td>Docker Compose</td>
+<td>Environment consistency, easy setup, orchestration-ready (Azure Container Apps for production)</td>
+</tr>
+<tr>
+<td><strong>API Documentation</strong></td>
+<td>Scalar (OpenAPI)</td>
+<td>Modern UI, superior to Swagger, .NET 10 native support</td>
+</tr>
+<tr>
+<td><strong>Logging</strong></td>
+<td>Serilog</td>
+<td>Structured logging, multiple sinks (console + file), 30-day retention</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="architectural-decisions">Architectural Decisions</h2>
+<h3 id="clean-architecture-4-layers">Clean Architecture (4 Layers)</h3>
+<ul>
+<li><strong>Domain Layer:</strong> Core entities, no external dependencies</li>
+<li><strong>Application Layer:</strong> Business logic, services, DTOs, Result Pattern</li>
+<li><strong>Infrastructure Layer:</strong> EF Core, repositories, RabbitMQ publisher</li>
+<li><strong>API Layer:</strong> Controllers, middleware, request/response handling</li>
+</ul>
+<p><strong>Benefits:</strong> Separation of concerns, testability, maintainability, dependency inversion</p>
+<h3 id="repository-pattern">Repository Pattern</h3>
+<p>Abstracts data access with interfaces in Domain layer and implementations in Infrastructure layer. Enables easy testing with mocks and technology-independent business logic.</p>
+<h3 id="result-pattern-functional-error-handling">Result Pattern (Functional Error Handling)</h3>
+<p>Type-safe error handling without exceptions. <code>Result&lt;T&gt;</code> with explicit success/failure paths improves performance and provides clear error propagation through layers.</p>
+<h3 id="input-validation-strategy">Input Validation Strategy</h3>
+<p><strong>ASP.NET Core Data Annotations</strong> with nullable types (<code>Guid?</code>, <code>DateTime?</code>, <code>decimal?</code>) and <code>[Required]</code> attributes. Custom <code>InvalidModelStateResponseFactory</code> ensures consistent error format across all validation failures.</p>
+<p><strong>Evolution:</strong> Initially explored <code>field</code> keyword with <code>ArgumentException</code> for validation, but Data Annotations provide better separation of concerns and integrate seamlessly with ASP.NET Core model binding.</p>
+<hr>
+<h2 id="azure-cloud-considerations">Azure Cloud Considerations</h2>
+<h3 id="database">Database</h3>
+<p><strong>Azure Database for PostgreSQL - Flexible Server</strong> offers fully managed service with automatic backups, HA, and cost-efficient Burstable/General Purpose tiers. Lower licensing costs compared to Azure SQL.</p>
+<h3 id="message-broker">Message Broker</h3>
+<p><strong>Azure Service Bus</strong> (Standard tier) recommended for production over self-hosted RabbitMQ. Fully managed, enterprise features (dead letter queues, duplicate detection), better Azure integration (Managed Identity, Key Vault).</p>
+<h3 id="compute">Compute</h3>
+<p><strong>Azure Container Apps</strong> for cost efficiency with auto-scaling and pay-per-use pricing. Scales to zero when idle. Migrate to <strong>AKS</strong> only if complex orchestration needed.</p>
+<hr>
+<h2 id="event-driven-architecture">Event-Driven Architecture</h2>
+<p><strong>PositionChanged Event</strong> emitted on forecast create/update to RabbitMQ exchange (<code>forecast.events</code>) with routing key (<code>position.changed</code>). Enables downstream systems (trading, reporting, alerts) to react asynchronously to position changes.</p>
+<hr>
+<h2 id="performance--scalability">Performance &amp; Scalability</h2>
+<ul>
+<li><strong>Async/Await:</strong> All I/O operations non-blocking</li>
+<li><strong>EF Core Optimizations:</strong> <code>AsNoTracking()</code> for read queries, selective <code>Include()</code>, connection pooling</li>
+<li><strong>Stateless Design:</strong> Horizontally scalable, scoped DbContext per request</li>
+<li><strong>Docker Ready:</strong> Multi-stage builds, health checks, persistent volumes</li>
+</ul>
+<hr>
+<h2 id="pragmatic-engineering-principles">Pragmatic Engineering Principles</h2>
+<ol>
+<li><strong>Favor Framework Conventions:</strong> Data Annotations over custom validation logic</li>
+<li><strong>Avoid Premature Optimization:</strong> I/O-bound microservice - database/network latency dominates</li>
+<li><strong>Readability over Cleverness:</strong> Limited C# advanced features (no <code>Span&lt;T&gt;</code>, no Extension Members)</li>
+<li><strong>Enterprise Patterns:</strong> Result Pattern, Repository Pattern, structured logging</li>
+<li><strong>Cloud-Ready:</strong> Docker containers, Azure service recommendations, cost-efficient architecture</li>
+</ol>
+<hr>
+<h2 id="summary">Summary</h2>
+<p>Technology choices balance <strong>pragmatism</strong> (efficient development) with <strong>professionalism</strong> (enterprise architecture). The stack demonstrates:</p>
+<ul>
+<li>Clean Architecture for maintainability and testability</li>
+<li>Event-driven design for scalability and decoupling</li>
+<li>Modern .NET performance with cross-platform containerization</li>
+<li>Azure cloud readiness with managed service options</li>
+<li>Industry best practices for energy trading platforms</li>
+</ul>
+<p><strong>Result:</strong> Enterprise-grade microservice exceeding interview requirements while maintaining code clarity and operational simplicity.</p>
+
+</body>
+</html>

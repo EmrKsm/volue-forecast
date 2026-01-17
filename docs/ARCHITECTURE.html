@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ARCHITECTURE.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="forecast-service---architecture-document">Forecast Service - Architecture Document</h1>
+<h2 id="1-overview">1. Overview</h2>
+<p>The Forecast Service is a microservice designed for managing power plant production forecasts in an energy trading platform. It provides RESTful APIs for creating, updating, and retrieving forecast data, as well as calculating company-wide position aggregations across multiple power plants.</p>
+<h2 id="2-system-architecture">2. System Architecture</h2>
+<h3 id="21-architectural-pattern">2.1 Architectural Pattern</h3>
+<p>The service follows <strong>Clean Architecture</strong> principles with a clear separation of concerns across four layers:</p>
+<pre class="hljs"><code><div>┌─────────────────────────────────────────────────────────┐
+│                    API Layer                            │
+│  (Controllers, Request/Response Handling, Middleware)   │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│               Application Layer                         │
+│    (Business Logic, Services, DTOs, Interfaces)        │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│                Domain Layer                             │
+│       (Entities, Domain Events, Interfaces)            │
+└─────────────────────────────────────────────────────────┘
+                     ▲
+┌────────────────────┴────────────────────────────────────┐
+│            Infrastructure Layer                         │
+│  (Data Access, Repositories, Event Publishing, EF Core)│
+└─────────────────────────────────────────────────────────┘
+</div></code></pre>
+<h3 id="22-system-flow-diagram">2.2 System Flow Diagram</h3>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart TB
+    Client[Client Application]
+    API[API Gateway / Load Balancer]
+    
+    subgraph "Forecast Service Container"
+        Controller[Controllers Layer]
+        Service[Service Layer]
+        Repo[Repository Layer]
+        Event[Event Publisher]
+    end
+    
+    DB[(PostgreSQL Database)]
+    MQ[Message Queue/Event Bus]
+    
+    Client -->|HTTP/REST| API
+    API -->|HTTP/REST| Controller
+    Controller -->|Business Logic| Service
+    Service -->|Data Access| Repo
+    Repo -->|SQL Queries| DB
+    Service -->|Publish Events| Event
+    Event -.->|PositionChanged Event| MQ
+    
+    style Controller fill:#e1f5ff
+    style Service fill:#fff4e1
+    style Repo fill:#e8f5e9
+    style DB fill:#f3e5f5
+    style Event fill:#ffe0b2
+</div></code></pre>
+<h3 id="23-domain-model">2.3 Domain Model</h3>
+<pre><code class="language-mermaid"><div class="mermaid">erDiagram
+    Company ||--o{ PowerPlant : "owns"
+    PowerPlant ||--o{ Forecast : "has"
+    
+    Company {
+        guid Id PK
+        string Name
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+    
+    PowerPlant {
+        guid Id PK
+        string Name
+        string Country
+        guid CompanyId FK
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+    
+    Forecast {
+        guid Id PK
+        guid PowerPlantId FK
+        datetime ForecastDateTime
+        decimal ProductionMWh
+        bool IsActive
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+</div></code></pre>
+<h2 id="3-api-endpoints">3. API Endpoints</h2>
+<h3 id="31-forecast-management">3.1 Forecast Management</h3>
+<h4 id="post-apiforecasts">POST /api/forecasts</h4>
+<p>Create or update a forecast for a power plant.</p>
+<p><strong>Request Body:</strong></p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"powerPlantId"</span>: <span class="hljs-string">"guid"</span>,
+  <span class="hljs-attr">"forecastDateTime"</span>: <span class="hljs-string">"2026-01-16T12:00:00Z"</span>,
+  <span class="hljs-attr">"productionMWh"</span>: <span class="hljs-number">150.5</span>
+}
+</div></code></pre>
+<p><strong>Response (201 Created / 200 OK):</strong></p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"success"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"id"</span>: <span class="hljs-string">"guid"</span>,
+    <span class="hljs-attr">"powerPlantId"</span>: <span class="hljs-string">"guid"</span>,
+    <span class="hljs-attr">"powerPlantName"</span>: <span class="hljs-string">"Turkey Power Plant"</span>,
+    <span class="hljs-attr">"country"</span>: <span class="hljs-string">"Turkey"</span>,
+    <span class="hljs-attr">"forecastDateTime"</span>: <span class="hljs-string">"2026-01-16T12:00:00Z"</span>,
+    <span class="hljs-attr">"productionMWh"</span>: <span class="hljs-number">150.5</span>,
+    <span class="hljs-attr">"createdAt"</span>: <span class="hljs-string">"2026-01-16T10:00:00Z"</span>,
+    <span class="hljs-attr">"updatedAt"</span>: <span class="hljs-string">"2026-01-16T10:00:00Z"</span>
+  },
+  <span class="hljs-attr">"error"</span>: <span class="hljs-literal">null</span>
+}
+</div></code></pre>
+<p><strong>Error Response (400 Bad Request / 404 Not Found):</strong></p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"success"</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">"data"</span>: <span class="hljs-literal">null</span>,
+  <span class="hljs-attr">"error"</span>: {
+    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"Not Found"</span>,
+    <span class="hljs-attr">"detail"</span>: <span class="hljs-string">"Power plant with ID ... not found"</span>,
+    <span class="hljs-attr">"status"</span>: <span class="hljs-number">404</span>,
+    <span class="hljs-attr">"instance"</span>: <span class="hljs-string">"/api/forecasts"</span>,
+    <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">"2026-01-18T10:30:00Z"</span>
+  }
+}
+</div></code></pre>
+<h4 id="get-apiforecastsid">GET /api/forecasts/{id}</h4>
+<p>Retrieve a specific forecast by ID.</p>
+<h4 id="get-apiforecastspower-plantpowerplantid">GET /api/forecasts/power-plant/{powerPlantId}</h4>
+<p>Get all forecasts for a power plant within a date range.</p>
+<p><strong>Query Parameters:</strong></p>
+<ul>
+<li><code>startDate</code>: DateTime</li>
+<li><code>endDate</code>: DateTime</li>
+</ul>
+<h3 id="32-company-position">3.2 Company Position</h3>
+<h4 id="get-apicompanypositioncompanyid">GET /api/companyposition/{companyId}</h4>
+<p>Calculate and retrieve the aggregated position for a company.</p>
+<p><strong>Query Parameters:</strong></p>
+<ul>
+<li><code>startDate</code>: DateTime</li>
+<li><code>endDate</code>: DateTime</li>
+</ul>
+<p><strong>Response:</strong></p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"success"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">"data"</span>: {
+    <span class="hljs-attr">"companyId"</span>: <span class="hljs-string">"guid"</span>,
+    <span class="hljs-attr">"companyName"</span>: <span class="hljs-string">"Energy Trading Corp"</span>,
+    <span class="hljs-attr">"startDate"</span>: <span class="hljs-string">"2026-01-16T00:00:00Z"</span>,
+    <span class="hljs-attr">"endDate"</span>: <span class="hljs-string">"2026-01-17T00:00:00Z"</span>,
+    <span class="hljs-attr">"totalPositionMWh"</span>: <span class="hljs-number">1250.75</span>,
+    <span class="hljs-attr">"powerPlantPositions"</span>: [
+      {
+        <span class="hljs-attr">"powerPlantId"</span>: <span class="hljs-string">"guid"</span>,
+        <span class="hljs-attr">"powerPlantName"</span>: <span class="hljs-string">"Turkey Power Plant"</span>,
+        <span class="hljs-attr">"country"</span>: <span class="hljs-string">"Turkey"</span>,
+        <span class="hljs-attr">"totalProductionMWh"</span>: <span class="hljs-number">450.25</span>,
+        <span class="hljs-attr">"forecastCount"</span>: <span class="hljs-number">24</span>
+      }
+    ]
+  },
+  <span class="hljs-attr">"error"</span>: <span class="hljs-literal">null</span>
+}
+</div></code></pre>
+<h2 id="4-data-flow">4. Data Flow</h2>
+<h3 id="41-createupdate-forecast-flow">4.1 Create/Update Forecast Flow</h3>
+<pre><code class="language-mermaid"><div class="mermaid">sequenceDiagram
+    participant Client
+    participant Controller
+    participant ForecastService
+    participant Repository
+    participant Database
+    participant EventPublisher
+    
+    Client->>Controller: POST /api/forecasts
+    Controller->>ForecastService: CreateOrUpdateForecastAsync()
+    ForecastService->>Repository: GetByPowerPlantAndDateTimeAsync()
+    Repository->>Database: Query existing forecast
+    Database-->>Repository: Forecast or null
+    
+    alt Forecast exists
+        ForecastService->>Repository: UpdateAsync()
+    else New forecast
+        ForecastService->>Repository: CreateAsync()
+    end
+    
+    Repository->>Database: Save changes
+    Database-->>Repository: Success
+    Repository-->>ForecastService: Forecast entity
+    ForecastService->>EventPublisher: PublishPositionChangedEventAsync()
+    EventPublisher-->>ForecastService: Event published
+    ForecastService-->>Controller: Result with ForecastResponse
+    Controller-->>Client: ApiResult with 200 OK / 201 Created
+</div></code></pre>
+<h3 id="42-get-company-position-flow">4.2 Get Company Position Flow</h3>
+<pre><code class="language-mermaid"><div class="mermaid">sequenceDiagram
+    participant Client
+    participant Controller
+    participant PositionService
+    participant CompanyRepo
+    participant PowerPlantRepo
+    participant ForecastRepo
+    participant Database
+    
+    Client->>Controller: GET /api/companyposition/{id}
+    Controller->>PositionService: GetCompanyPositionAsync()
+    PositionService->>CompanyRepo: GetByIdAsync()
+    CompanyRepo->>Database: Query company
+    Database-->>CompanyRepo: Company
+    PositionService->>PowerPlantRepo: GetByCompanyIdAsync()
+    PowerPlantRepo->>Database: Query power plants
+    Database-->>PowerPlantRepo: List of power plants
+    
+    loop For each power plant
+        PositionService->>ForecastRepo: GetActiveByPowerPlantAsync()
+        ForecastRepo->>Database: Query forecasts
+        Database-->>ForecastRepo: List of forecasts
+    end
+    
+    PositionService->>PositionService: Calculate totals
+    PositionService-->>Controller: CompanyPositionResponse
+    Controller-->>Client: 200 OK
+</div></code></pre>
+<h2 id="5-event-driven-architecture">5. Event-Driven Architecture</h2>
+<h3 id="51-positionchanged-event">5.1 PositionChanged Event</h3>
+<p>When a forecast is created or updated, the service emits a <code>PositionChangedEvent</code>:</p>
+<pre class="hljs"><code><div>{
+    <span class="hljs-string">"CompanyId"</span>: <span class="hljs-string">"guid"</span>,
+    <span class="hljs-string">"StartDate"</span>: <span class="hljs-string">"2026-01-16T00:00:00Z"</span>,
+    <span class="hljs-string">"EndDate"</span>: <span class="hljs-string">"2026-01-17T00:00:00Z"</span>,
+    <span class="hljs-string">"TotalPositionMWh"</span>: <span class="hljs-number">1250.75</span>,
+    <span class="hljs-string">"EventTimestamp"</span>: <span class="hljs-string">"2026-01-16T10:30:00Z"</span>,
+    <span class="hljs-string">"Reason"</span>: <span class="hljs-string">"Forecast Created"</span>
+}
+</div></code></pre>
+<p><strong>Current Implementation:</strong> RabbitMQ message broker running in Docker container</p>
+<ul>
+<li><strong>Exchange:</strong> <code>forecast.events</code> (topic exchange)</li>
+<li><strong>Routing Key:</strong> <code>position.changed</code></li>
+<li><strong>Message Format:</strong> JSON serialized events</li>
+<li><strong>Management UI:</strong> http://localhost:15672 (admin/admin)</li>
+<li><strong>Connection:</strong> Automatic reconnection with retry logic</li>
+</ul>
+<p><strong>Alternative Options:</strong> Azure Service Bus, Apache Kafka, or AWS EventBridge</p>
+<h2 id="6-data-persistence">6. Data Persistence</h2>
+<h3 id="61-database-strategy">6.1 Database Strategy</h3>
+<ul>
+<li><strong>Database:</strong> PostgreSQL 16</li>
+<li><strong>ORM:</strong> Entity Framework Core 10.0</li>
+<li><strong>Migration Strategy:</strong> Code-First with automatic migrations on startup</li>
+<li><strong>Connection Pooling:</strong> Managed by Npgsql provider</li>
+<li><strong>Indexing Strategy:</strong>
+<ul>
+<li>Composite index on <code>(PowerPlantId, ForecastDateTime, IsActive)</code> for fast forecast queries</li>
+<li>Composite index on <code>(CompanyId, Country)</code> for power plant queries</li>
+</ul>
+</li>
+</ul>
+<h3 id="62-data-seeding">6.2 Data Seeding</h3>
+<p>Initial data includes:</p>
+<ul>
+<li>1 Company: &quot;Energy Trading Corp&quot;</li>
+<li>3 Power Plants: Turkey, Bulgaria, Spain</li>
+</ul>
+<h2 id="7-thread-safety--concurrency">7. Thread Safety &amp; Concurrency</h2>
+<h3 id="71-thread-safety-considerations">7.1 Thread Safety Considerations</h3>
+<ol>
+<li><strong>DbContext Scoping:</strong> Each HTTP request gets its own scoped DbContext instance</li>
+<li><strong>Repository Pattern:</strong> Prevents shared state issues</li>
+<li><strong>Async/Await:</strong> All I/O operations are async for better scalability</li>
+<li><strong>Optimistic Concurrency:</strong> Can be added using row versioning if needed</li>
+</ol>
+<h3 id="72-scalability">7.2 Scalability</h3>
+<ul>
+<li><strong>Stateless Design:</strong> Service can be horizontally scaled</li>
+<li><strong>Database Connection Pooling:</strong> Efficient resource utilization</li>
+<li><strong>Docker Support:</strong> Easy container orchestration with Kubernetes or Docker Swarm</li>
+</ul>
+<h2 id="8-security-considerations">8. Security Considerations</h2>
+<h3 id="81-current-implementation">8.1 Current Implementation</h3>
+<ul>
+<li><strong>Result Pattern:</strong> Type-safe error handling without exceptions</li>
+<li><strong>Model State Validation:</strong> Nullable properties with <code>[Required]</code> and <code>[Range]</code> attributes</li>
+<li><strong>Global Exception Handler:</strong> Middleware for consistent error responses</li>
+<li><strong>Custom Validation Error Factory:</strong> Returns unified error format for validation failures</li>
+<li><strong>Structured error responses:</strong> Consistent error format with codes and messages</li>
+<li><strong>CORS configuration:</strong> Configured for cross-origin requests</li>
+<li><strong>Docker isolation:</strong> Services isolated in separate containers</li>
+</ul>
+<h3 id="82-production-recommendations">8.2 Production Recommendations</h3>
+<ul>
+<li>Add JWT authentication</li>
+<li>Implement rate limiting</li>
+<li>Add API versioning</li>
+<li>Enable HTTPS only</li>
+<li>Add request logging and monitoring</li>
+<li>Implement API key authentication</li>
+</ul>
+<h2 id="9-deployment-architecture">9. Deployment Architecture</h2>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    LB[Load Balancer]
+    
+    subgraph "Container Orchestration (Docker/Kubernetes)"
+        API1[API Instance 1]
+        API2[API Instance 2]
+        API3[API Instance N]
+    end
+    
+    DB[(PostgreSQL<br/>Primary)]
+    DBR[(PostgreSQL<br/>Replica)]
+    MQ[RabbitMQ<br/>Message Broker]
+    
+    LB --> API1
+    LB --> API2
+    LB --> API3
+    
+    API1 --> DB
+    API2 --> DB
+    API3 --> DB
+    
+    API1 -.Publish Events.-> MQ
+    API2 -.Publish Events.-> MQ
+    API3 -.Publish Events.-> MQ
+    
+    DB -.Replication.-> DBR
+    
+    style LB fill:#ff9800
+    style API1 fill:#4caf50
+    style API2 fill:#4caf50
+    style API3 fill:#4caf50
+    style DB fill:#2196f3
+    style DBR fill:#03a9f4
+    style MQ fill:#ff6f00
+</div></code></pre>
+<h2 id="10-monitoring--observability">10. Monitoring &amp; Observability</h2>
+<h3 id="101-recommended-metrics">10.1 Recommended Metrics</h3>
+<ul>
+<li>Request latency (p50, p95, p99)</li>
+<li>Error rates by endpoint</li>
+<li>Database query performance</li>
+<li>Event publishing success rate</li>
+<li>Active connections</li>
+</ul>
+<h3 id="102-logging">10.2 Logging</h3>
+<ul>
+<li><strong>Structured logging using Serilog:</strong> Already implemented</li>
+<li><strong>Console Sink:</strong> Real-time log output during development</li>
+<li><strong>File Sink:</strong> Daily rolling logs stored in <code>logs/</code> directory with 30-day retention</li>
+<li><strong>Log levels:</strong> Debug, Information, Warning, Error, Critical</li>
+<li><strong>Log format:</strong> JSON structured format with timestamps, log levels, and context</li>
+<li><strong>Future Enhancement:</strong> Correlation IDs for distributed request tracing</li>
+</ul>
+<h3 id="102-modern-c-features">10.2 Modern C# Features</h3>
+<p><strong>C# 14 field Keyword (Limited Usage):</strong></p>
+<ul>
+<li><strong>BaseEntity only:</strong> Used for UTC timestamp normalization in CreatedAt and UpdatedAt properties</li>
+<li><strong>Benefit:</strong> Cleaner code by eliminating explicit backing fields for date normalization logic</li>
+<li><strong>Example:</strong> <code>set =&gt; field = value.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(value, DateTimeKind.Utc) : value.ToUniversalTime();</code></li>
+</ul>
+<p><strong>Validation Strategy - Data Annotations (ASP.NET Core Standard):</strong></p>
+<ul>
+<li><strong>Approach:</strong> Nullable properties with <code>[Required]</code> and <code>[Range]</code> data annotations</li>
+<li><strong>Rationale:</strong>
+<ul>
+<li>Data annotations are the ASP.NET Core idiomatic way for input validation</li>
+<li>Automatic validation before controller action execution</li>
+<li>Consistent error responses through custom <code>InvalidModelStateResponseFactory</code></li>
+<li>Separates validation concerns from business logic</li>
+<li>No exceptions during model binding - validation handled declaratively</li>
+</ul>
+</li>
+</ul>
+<p><strong>Rationale for Pragmatic Approach:</strong></p>
+<ul>
+<li>This is an <strong>I/O-bound microservice</strong> where network/database latency dominates performance</li>
+<li>Event publishing happens <strong>occasionally</strong> (on forecast changes), not in tight loops</li>
+<li>Advanced C# 14 features like <code>Span&lt;T&gt;</code> would add complexity without measurable benefits</li>
+<li><strong>Principle:</strong> Favor readability, maintainability, and ASP.NET Core conventions over micro-optimizations</li>
+</ul>
+<p><strong>C# 14 Features Evaluated but Not Used:</strong></p>
+<ul>
+<li>❌ <strong>Extension Members:</strong> Only replaced <code>Sum()</code> which is already concise (overengineering)</li>
+<li>❌ <strong>Span<T> optimizations:</strong> No performance bottlenecks in string operations or byte encoding</li>
+<li>❌ <strong>field keyword for validation:</strong> Data Annotations provide better separation of concerns</li>
+</ul>
+<h2 id="11-technology-stack-summary">11. Technology Stack Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>.NET 10 / ASP.NET Core</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>C# 14</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>PostgreSQL 16</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>Entity Framework Core 10.0</td>
+</tr>
+<tr>
+<td>Message Broker</td>
+<td>RabbitMQ 3.13 with Management Plugin</td>
+</tr>
+<tr>
+<td>Containerization</td>
+<td>Docker &amp; Docker Compose</td>
+</tr>
+<tr>
+<td>API Documentation</td>
+<td>Scalar.AspNetCore (OpenAPI)</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>Serilog with Console and File Sinks</td>
+</tr>
+<tr>
+<td>Design Patterns</td>
+<td>Clean Architecture, Repository Pattern, Result Pattern</td>
+</tr>
+</tbody>
+</table>
+<h2 id="12-future-enhancements">12. Future Enhancements</h2>
+<ol>
+<li><strong>Caching Layer:</strong> Redis for frequently accessed data</li>
+<li><strong>Dead Letter Queue:</strong> Error handling for failed RabbitMQ messages</li>
+<li><strong>GraphQL Support:</strong> Alternative to REST API</li>
+<li><strong>Real-time Updates:</strong> SignalR for live position updates</li>
+<li><strong>Time Series Optimization:</strong> TimescaleDB for historical data</li>
+<li><strong>Authentication:</strong> Identity Server or Azure AD B2C</li>
+<li><strong>Monitoring:</strong> Application Insights, Prometheus + Grafana</li>
+<li><strong>Event Consumers:</strong> Separate microservices subscribing to RabbitMQ events</li>
+</ol>
+
+</body>
+</html>
