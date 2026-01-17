@@ -30,13 +30,16 @@ public abstract class BaseApiController : ControllerBase
     /// </summary>
     private static int MapErrorToStatusCode(Error error)
     {
+        // C# 14: Using ReadOnlySpan<char> for efficient string operations
+        ReadOnlySpan<char> code = error.Code.AsSpan();
+        
         return error.Code switch
         {
-            // Not Found errors -> 404
-            var code when code.EndsWith(".NotFound") => StatusCodes.Status404NotFound,
+            // Not Found errors -> 404 (using Span<T> for efficient suffix check)
+            var c when code.EndsWith(".NotFound".AsSpan()) => StatusCodes.Status404NotFound,
 
             // Concurrency errors -> 409 Conflict
-            var code when code.EndsWith(".ConcurrencyConflict") => StatusCodes.Status409Conflict,
+            var c when code.EndsWith(".ConcurrencyConflict".AsSpan()) => StatusCodes.Status409Conflict,
 
             // Database errors -> 503 Service Unavailable
             "Database.ConnectionError" => StatusCodes.Status503ServiceUnavailable,
@@ -48,7 +51,7 @@ public abstract class BaseApiController : ControllerBase
             "Database.ConstraintViolation" => StatusCodes.Status409Conflict,
 
             // Database errors -> 500 Internal Server Error
-            var code when code.Contains(".DatabaseError") => StatusCodes.Status500InternalServerError,
+            var c when code.Contains(".DatabaseError".AsSpan(), StringComparison.Ordinal) => StatusCodes.Status500InternalServerError,
 
             // Validation errors -> 400 Bad Request
             _ => StatusCodes.Status400BadRequest

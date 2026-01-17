@@ -68,14 +68,23 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-            var body = Encoding.UTF8.GetBytes(message);
+            // C# 14: Using Span<T> for efficient UTF-8 encoding
+            var messageSpan = message.AsSpan();
+            var byteCount = Encoding.UTF8.GetByteCount(messageSpan);
+            Span<byte> body = byteCount <= 256 ? stackalloc byte[byteCount] : new byte[byteCount];
+            Encoding.UTF8.GetBytes(messageSpan, body);
+
+            // C# 14: Using Span<T> for GUID conversion (no allocation)
+            Span<char> guidChars = stackalloc char[36];
+            Guid.NewGuid().TryFormat(guidChars, out _);
+            var messageId = new string(guidChars);
 
             var properties = new BasicProperties
             {
                 ContentType = "application/json",
                 DeliveryMode = DeliveryModes.Persistent,
                 Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
-                MessageId = Guid.NewGuid().ToString(),
+                MessageId = messageId,
                 Type = nameof(PositionChangedEvent)
             };
 
@@ -84,7 +93,7 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
                 routingKey: _routingKey,
                 mandatory: false,
                 basicProperties: properties,
-                body: body);
+                body: body.ToArray());
 
             _logger.LogInformation(
                 "Published Position Changed Event to RabbitMQ: CompanyId={CompanyId}, TotalPosition={TotalPosition} MWh, Reason={Reason}",

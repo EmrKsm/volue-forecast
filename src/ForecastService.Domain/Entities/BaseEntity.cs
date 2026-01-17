@@ -4,20 +4,20 @@ public abstract class BaseEntity
 {
     public Guid Id { get; set; }
 
-    private DateTime _createdAt;
+    // C# 14: Using 'field' keyword instead of explicit backing fields
     public DateTime CreatedAt
     {
-        get => _createdAt;
-        set => _createdAt = value.Kind == DateTimeKind.Unspecified
+        get;
+        set => field = value.Kind == DateTimeKind.Unspecified
             ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
             : value.ToUniversalTime();
     }
 
-    private DateTime _updatedAt;
+    // C# 14: Using 'field' keyword for cleaner property implementation
     public DateTime UpdatedAt
     {
-        get => _updatedAt;
-        set => _updatedAt = value.Kind == DateTimeKind.Unspecified
+        get;
+        set => field = value.Kind == DateTimeKind.Unspecified
             ? DateTime.SpecifyKind(value, DateTimeKind.Utc)
             : value.ToUniversalTime();
     }
