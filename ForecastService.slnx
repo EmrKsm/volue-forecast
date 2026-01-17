@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ForecastService.Api/ForecastService.Api.csproj" />
+    <Project Path="src/ForecastService.Application/ForecastService.Application.csproj" />
+    <Project Path="src/ForecastService.Domain/ForecastService.Domain.csproj" />
+    <Project Path="src/ForecastService.Infrastructure/ForecastService.Infrastructure.csproj" />
+  </Folder>
+</Solution>

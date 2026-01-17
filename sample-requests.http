@@ -1,0 +1,373 @@
+# Forecast Service API - Sample HTTP Requests
+# Use with REST Client extension in VS Code or Postman
+# Make sure the API is running: docker-compose up -d
+
+### Variables
+@baseUrl = http://localhost:8080
+@companyId = 11111111-1111-1111-1111-111111111111
+@turkeyPlantId = 22222222-2222-2222-2222-222222222222
+@bulgariaPlantId = 33333333-3333-3333-3333-333333333333
+@spainPlantId = 44444444-4444-4444-4444-444444444444
+
+### Expected Success Response Format:
+# {
+#   "isSuccess": true,
+#   "value": { 
+#     "id": "guid",
+#     "powerPlantId": "guid",
+#     "powerPlantName": "Plant Name",
+#     "country": "Country",
+#     "forecastDateTime": "2026-01-17T12:00:00Z",
+#     "productionMWh": 150.5,
+#     "createdAt": "2026-01-17T10:30:00Z",
+#     "updatedAt": "2026-01-17T10:30:00Z"
+#   },
+#   "error": null
+# }
+
+### Expected Error Response Format:
+# {
+#   "isSuccess": false,
+#   "value": null,
+#   "error": {
+#     "code": "PowerPlant.NotFound",
+#     "message": "Power plant with ID ... not found"
+#   }
+# }
+
+### 1. Create Forecast for Turkey Power Plant
+# Expected: 201 Created
+# Response includes forecast ID, power plant name, country
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": 150.5
+}
+
+# Expected Response:
+# {
+#   "isSuccess": true,
+#   "value": {
+#     "id": "f3e7a8b9-4c2d-4e1f-9a6b-7d8c3e5f2a1b",
+#     "powerPlantId": "22222222-2222-2222-2222-222222222222",
+#     "powerPlantName": "Turkey Power Plant",
+#     "country": "Turkey",
+#     "forecastDateTime": "2026-01-17T12:00:00Z",
+#     "productionMWh": 150.5,
+#     "createdAt": "2026-01-17T10:30:00Z",
+#     "updatedAt": "2026-01-17T10:30:00Z"
+#   },
+#   "error": null
+# }
+
+### 2. Create Forecast for Bulgaria Power Plant
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/jsonUpsert - same powerPlantId and forecastDateTime)
+# Expected: 200 OK (forecast already exists for this plant and time)
+# Previous forecast for same time is deactivated, new one created
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": 175.75
+}
+
+# Expected Response:
+# {
+#   "isSuccess": true,
+#   "value": {
+#     "id": "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",  // New ID
+#     "powerPlantId": "22222222-2222-2222-2222-222222222222",
+#     "powerPlantName": "Turkey Power Plant",
+#     "country": "Turkey",
+#     "forecastDateTime": "2026-01-17T12:00:00Z",
+#     "productionMWh": 175.75,  // Updated value
+#     "createdAt": "2026-01-17T10:35:00Z",
+#     "updatedAt": "2026-01-17T10:35:00Z"
+#   },
+#   "error": null
+# }
+# Note: PositionChanged event emitted to RabbitMQ## 3. Create Forecast for Spain Power Plant
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{spainPlantId}}",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": 200.0 (Aggregated across all power plants)
+# Expected: 200 OK
+# Returns total position and breakdown by power plant
+GET {{baseUrl}}/api/companyposition/{{companyId}}?startDate=2026-01-16T00:00:00Z&endDate=2026-01-18T23:59:59Z
+
+# Expected Response:
+# {
+#   "isSuccess": true,
+#   "value": {
+#     "companyId": "11111111-1111-1111-1111-111111111111",
+#     "companyName": "Energy Trading Corp",
+#     "startDate": "2026-01-16T00:00:00Z",
+#     "endDate": "2026-01-18T23:59:59Z",
+#     "totalPositionMWh": 530.75,
+#     "powerPlantPositions": [
+#       {
+#         "powerPlantId": "22222222-2222-2222-2222-222222222222",
+#         "powerPlantName": "Turkey Power Plant",
+#         "country": "Turkey",
+#         "totalProductionMWh": 175.75,
+#         "forecastCount": 1
+#       },
+#       {
+#         "powerPlantId": "33333333-3333-3333-3333-333333333333",
+#         "powerPlantName": "Bulgaria Power Plant",
+#         "country": "Bulgaria",
+#         "totalProductionMWh": 180.25,
+#         "forecastCount": 1
+#       },
+#       {
+#         "powerPlantId": "44444444-4444-4444-4444-444444444444",
+#         "powerPlantName": "Spain Power Plant",
+#         "country": "Spain",
+#         "totalProductionMWh": 200.0,
+#         "forecastCount": 1
+#       }
+#     ]
+#   },
+#   "error": null
+# }
+
+### 4. Update Existing Forecast (same powerPlantId and forecastDateTime)
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": 175.75
+}
+
+### 5. Get Forecast by ID (replace with actual ID from previous responses)
+GET {{baseUrl}}/api/forecasts/00000000-0000-0000-0000-000000000000
+
+### 6. Get Forecasts for Turkey Power Plant
+GET {{baseUrl}}/api/forecasts/power-plant/{{turkeyPlantId}}?startDate=2026-01-16T00:00:00Z&endDate=2026-01-18T23:59:59Z
+
+### 7. Get Company Position
+GET {{baseUrl}}/api/companyposition/{{companyId}}?startDate=2026-01-16T00:00:00Z&endDate=2026-01-18T23:59:59Z
+
+### 8. Create Multiple Forecasts (24 hours for Turkey)
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T00:00:00Z",
+  "productionMWh": 120.0
+}
+
+###
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T01:00:00Z",
+  "productionMWh": 125.5
+}
+
+###
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T02:00:00Z",
+  "productionMWh": 130.0
+}
+
+###
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T03:00:00Z",
+  "productionMWh": 135.5
+}
+
+### 9. ERROR: Invalid Power Plant ID (Not Found)
+# Expected: 400 Bad Request
+# Error Code: PowerPlant.NotFound
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "00000000-0000-0000-0000-000000000000",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": 150.5
+}
+
+# Expected Response:
+# {
+#   "isSuccess": false,
+#   "value": null,
+#   "error": {
+#     "code": "PowerPlant.NotFound",
+#     "message": "Power plant with ID 00000000-0000-0000-0000-000000000000 not found"
+#   }
+# }
+
+### 10. ERROR: Negative Production Value
+# Expected: 400 Bad Request
+# Error Code: Forecast.NegativeProduction
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": -50.0
+}
+
+# Expected Response:
+# {
+#   "isSuccess": false,
+#   "value": null,
+#   "error": {
+#     "code": "Forecast.NegativeProduction",
+#     "message": "Production value cannot be negative"
+#   }
+# }
+
+### 11. ERROR: Invalid Date Range (Start Date After End Date)
+# Expected: 400 Bad Request
+# Error Code: Forecast.InvalidDateRange
+GET {{baseUrl}}/api/companyposition/{{companyId}}?startDate=2026-01-18T00:00:00Z&endDate=2026-01-16T00:00:00Z
+
+# Expected Response:
+# {
+#   "isSuccess": false,
+#   "value": null,
+#   "error": {
+#     "code": "Forecast.InvalidDateRange",
+#     "message": "Start date must be before or equal to end date"
+#   }
+# }
+
+### 12. ERROR: Company Not Found
+# Expected: 404 Not Found
+# Error Code: Company.NotFound
+GET {{baseUrl}}/api/companyposition/99999999-9999-9999-9999-999999999999?startDate=2026-01-16T00:00:00Z&endDate=2026-01-18T23:59:59Z
+
+# Expected Response:
+# {
+#   "isSuccess": false,
+#   "value": null,
+#   "error": {
+#     "code": "Company.NotFound",
+#     "message": "Company with ID 99999999-9999-9999-9999-999999999999 not found"
+#   }
+# }
+
+### 13. ERROR: Forecast Not Found by ID
+# Expected: 404 Not Found
+# Error Code: Forecast.NotFound
+GET {{baseUrl}}/api/forecasts/99999999-9999-9999-9999-999999999999
+
+# Expected Response:
+# {
+#   "isSuccess": false,
+#   "value": null,
+#   "error": {
+#     "code": "Forecast.NotFound",
+#     "message": "Forecast with ID 99999999-9999-9999-9999-999999999999 not found"
+#   }
+# }
+
+### 14. ERROR: Missing Required Fields (Validation Error)
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}"
+  // Missing forecastDateTime and productionMWh
+}
+
+### 15. ERROR: Invalid GUID Format
+# Expected: 400 Bad Request
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "invalid-guid-format",
+  "forecastDateTime": "2026-01-17T12:00:00Z",
+  "productionMWh": 150.5
+}
+
+##############################################
+# TESTING WORKFLOW - Complete Test Scenario
+##############################################
+
+### Step 1: Create forecasts for all three power plants
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T10:00:00Z",
+  "productionMWh": 850.5
+}
+
+###
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{bulgariaPlantId}}",
+  "forecastDateTime": "2026-01-17T10:00:00Z",
+  "productionMWh": 720.25
+}
+
+###
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{spainPlantId}}",
+  "forecastDateTime": "2026-01-17T10:00:00Z",
+  "productionMWh": 880.0
+}
+
+### Step 2: Verify company position (should be 2450.75 MWh)
+GET {{baseUrl}}/api/companyposition/{{companyId}}?startDate=2026-01-17T00:00:00Z&endDate=2026-01-17T23:59:59Z
+
+### Step 3: Update Turkey forecast (tests upsert logic)
+POST {{baseUrl}}/api/forecasts
+Content-Type: application/json
+
+{
+  "powerPlantId": "{{turkeyPlantId}}",
+  "forecastDateTime": "2026-01-17T10:00:00Z",
+  "productionMWh": 900.0
+}
+
+### Step 4: Verify updated position (should be 2500.25 MWh now)
+GET {{baseUrl}}/api/companyposition/{{companyId}}?startDate=2026-01-17T00:00:00Z&endDate=2026-01-17T23:59:59Z
+
+### Step 5: Get forecasts for Turkey plant
+GET {{baseUrl}}/api/forecasts/power-plant/{{turkeyPlantId}}?startDate=2026-01-17T00:00:00Z&endDate=2026-01-17T23:59:59Z
+
+##############################################
+# RabbitMQ Event Verification
+##############################################
+# After running the above requests:
+# 1. Open RabbitMQ Management UI: http://localhost:15672 (admin/admin)
+# 2. Go to Queues tab
+# 3. Create queue: position-events-queue
+# 4. Bind to exchange: forecast.events with routing key: position.changed
+# 5. Check messages in the queue to see PositionChanged events
