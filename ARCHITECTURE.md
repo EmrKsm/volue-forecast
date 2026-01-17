@@ -117,14 +117,30 @@ Create or update a forecast for a power plant.
 **Response (201 Created / 200 OK):**
 ```json
 {
-  "id": "guid",
-  "powerPlantId": "guid",
-  "powerPlantName": "Turkey Power Plant",
-  "country": "Turkey",
-  "forecastDateTime": "2026-01-16T12:00:00Z",
-  "productionMWh": 150.5,
-  "createdAt": "2026-01-16T10:00:00Z",
-  "updatedAt": "2026-01-16T10:00:00Z"
+  "isSuccess": true,
+  "value": {
+    "id": "guid",
+    "powerPlantId": "guid",
+    "powerPlantName": "Turkey Power Plant",
+    "country": "Turkey",
+    "forecastDateTime": "2026-01-16T12:00:00Z",
+    "productionMWh": 150.5,
+    "createdAt": "2026-01-16T10:00:00Z",
+    "updatedAt": "2026-01-16T10:00:00Z"
+  },
+  "error": null
+}
+```
+
+**Error Response (400 Bad Request / 404 Not Found):**
+```json
+{
+  "isSuccess": false,
+  "value": null,
+  "error": {
+    "code": "PowerPlant.NotFound",
+    "message": "Power plant with ID ... not found"
+  }
 }
 ```
 
@@ -150,20 +166,24 @@ Calculate and retrieve the aggregated position for a company.
 **Response:**
 ```json
 {
-  "companyId": "guid",
-  "companyName": "Energy Trading Corp",
-  "startDate": "2026-01-16T00:00:00Z",
-  "endDate": "2026-01-17T00:00:00Z",
-  "totalPositionMWh": 1250.75,
-  "powerPlantPositions": [
-    {
-      "powerPlantId": "guid",
-      "powerPlantName": "Turkey Power Plant",
-      "country": "Turkey",
-      "totalProductionMWh": 450.25,
-      "forecastCount": 24
-    }
-  ]
+  "isSuccess": true,
+  "value": {
+    "companyId": "guid",
+    "companyName": "Energy Trading Corp",
+    "startDate": "2026-01-16T00:00:00Z",
+    "endDate": "2026-01-17T00:00:00Z",
+    "totalPositionMWh": 1250.75,
+    "powerPlantPositions": [
+      {
+        "powerPlantId": "guid",
+        "powerPlantName": "Turkey Power Plant",
+        "country": "Turkey",
+        "totalProductionMWh": 450.25,
+        "forecastCount": 24
+      }
+    ]
+  },
+  "error": null
 }
 ```
 
@@ -197,8 +217,8 @@ sequenceDiagram
     Repository-->>ForecastService: Forecast entity
     ForecastService->>EventPublisher: PublishPositionChangedEventAsync()
     EventPublisher-->>ForecastService: Event published
-    ForecastService-->>Controller: ForecastResponse
-    Controller-->>Client: 200 OK / 201 Created
+    ForecastService-->>Controller: Result<ForecastResponse>
+    Controller-->>Client: ApiResult with 200 OK / 201 Created
 ```
 
 ### 4.2 Get Company Position Flow
@@ -250,8 +270,14 @@ When a forecast is created or updated, the service emits a `PositionChangedEvent
 }
 ```
 
-**Current Implementation:** In-memory event publisher with logging (for demonstration)
-**Production Ready:** Can be replaced with RabbitMQ, Azure Service Bus, Apache Kafka, or AWS EventBridge
+**Current Implementation:** RabbitMQ message broker running in Docker container
+- **Exchange:** `forecast.events` (topic exchange)
+- **Routing Key:** `position.changed`
+- **Message Format:** JSON serialized events
+- **Management UI:** http://localhost:15672 (admin/admin)
+- **Connection:** Automatic reconnection with retry logic
+
+**Alternative Options:** Azure Service Bus, Apache Kafka, or AWS EventBridge
 
 ## 6. Data Persistence
 
@@ -289,10 +315,12 @@ Initial data includes:
 ## 8. Security Considerations
 
 ### 8.1 Current Implementation
-- Input validation in controllers
-- Model validation using data annotations
-- Exception handling middleware
-- CORS configuration for cross-origin requests
+- **Result Pattern:** Type-safe error handling without exceptions
+- **Input validation:** Data annotations and FluentValidation-ready
+- **Model validation:** Automatic validation in controllers
+- **Structured error responses:** Consistent error format with codes and messages
+- **CORS configuration:** Configured for cross-origin requests
+- **Docker isolation:** Services isolated in separate containers
 
 ### 8.2 Production Recommendations
 - Add JWT authentication
@@ -316,6 +344,7 @@ flowchart LR
     
     DB[(PostgreSQL<br/>Primary)]
     DBR[(PostgreSQL<br/>Replica)]
+    MQ[RabbitMQ<br/>Message Broker]
     
     LB --> API1
     LB --> API2
@@ -325,6 +354,10 @@ flowchart LR
     API2 --> DB
     API3 --> DB
     
+    API1 -.Publish Events.-> MQ
+    API2 -.Publish Events.-> MQ
+    API3 -.Publish Events.-> MQ
+    
     DB -.Replication.-> DBR
     
     style LB fill:#ff9800
@@ -333,6 +366,7 @@ flowchart LR
     style API3 fill:#4caf50
     style DB fill:#2196f3
     style DBR fill:#03a9f4
+    style MQ fill:#ff6f00
 ```
 
 ## 10. Monitoring & Observability
@@ -345,28 +379,53 @@ flowchart LR
 - Active connections
 
 ### 10.2 Logging
-- Structured logging using Serilog (can be added)
-- Log levels: Debug, Information, Warning, Error
-- Correlation IDs for request tracing
+- **Structured logging using Serilog:** Already implemented
+- **Console Sink:** Real-time log output during development
+- **File Sink:** Daily rolling logs stored in `logs/` directory with 30-day retention
+- **Log levels:** Debug, Information, Warning, Error, Critical
+- **Log format:** JSON structured format with timestamps, log levels, and context
+- **Future Enhancement:** Correlation IDs for distributed request tracing
+
+### 10.2 C# 14 Language Features
+
+**Implementation:**
+
+1. **field Keyword Usage:**
+   - BaseEntity: Backing field access for UTC timestamp normalization
+   - CreateOrUpdateForecastRequest: Inline validation with field keyword
+   - Cleaner code by eliminating explicit backing fields
+
+2. **Span<T> Optimizations:**
+   - BaseApiController: `ReadOnlySpan<char>` for zero-allocation error code comparisons
+   - RabbitMqEventPublisher: Stack allocation for message encoding and GUID formatting
+   - Performance benefits in high-throughput scenarios
+
+**Benefits:**
+- Reduced memory allocations in hot paths
+- Cleaner property implementations with inline validation
+- Modern C# patterns for performance-critical operations
 
 ## 11. Technology Stack Summary
 
 | Layer | Technology |
 |-------|-----------|
 | Framework | .NET 10 / ASP.NET Core |
-| Language | C# 13 |
+| Language | C# 14 |
 | Database | PostgreSQL 16 |
 | ORM | Entity Framework Core 10.0 |
+| Message Broker | RabbitMQ 3.13 with Management Plugin |
 | Containerization | Docker & Docker Compose |
-| API Documentation | OpenAPI / Swagger |
-| Design Pattern | Clean Architecture, Repository Pattern |
+| API Documentation | Scalar.AspNetCore (OpenAPI) |
+| Logging | Serilog with Console and File Sinks |
+| Design Patterns | Clean Architecture, Repository Pattern, Result Pattern |
 
 ## 12. Future Enhancements
 
 1. **Caching Layer:** Redis for frequently accessed data
-2. **Message Queue:** RabbitMQ or Azure Service Bus for event publishing
+2. **Dead Letter Queue:** Error handling for failed RabbitMQ messages
 3. **GraphQL Support:** Alternative to REST API
 4. **Real-time Updates:** SignalR for live position updates
 5. **Time Series Optimization:** TimescaleDB for historical data
 6. **Authentication:** Identity Server or Azure AD B2C
 7. **Monitoring:** Application Insights, Prometheus + Grafana
+8. **Event Consumers:** Separate microservices subscribing to RabbitMQ events

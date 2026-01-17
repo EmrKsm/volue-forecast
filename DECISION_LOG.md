@@ -12,8 +12,12 @@
 **Rationale:**
 - **Modern Performance:** .NET 10 offers excellent performance with minimal allocations and high throughput
 - **Cross-Platform:** Runs on Windows, Linux, and macOS, perfect for containerized deployments
-- **Strong Typing:** C# provides compile-time safety and excellent tooling support
+- **Strong Typing:** C# 14 provides compile-time safety with latest language features
 - **Async-First:** Native async/await support for I/O-bound operations like database queries
+- **C# 14 Features Implemented:**
+  - `field` keyword for property backing field access in BaseEntity and DTOs
+  - `Span<T>` and `ReadOnlySpan<char>` for zero-allocation string operations
+  - Stack allocation optimizations for performance-critical paths
 - **Enterprise Ready:** Widely adopted in the energy and trading sectors
 - **Long-term Support:** Microsoft provides excellent support and regular updates
 
@@ -133,18 +137,22 @@
 
 ## 7. Event Publishing
 
-### Decision: In-Memory Event Publisher (Demonstrative) with Interface for Production Integration
+### Decision: RabbitMQ Message Broker
 **Rationale:**
-- **Simplicity:** Easy to demonstrate without additional infrastructure
-- **Logging:** Shows event flow in application logs
-- **Extensibility:** Interface allows easy swap to production message broker
-- **Interview Focus:** Shows architectural understanding without overcomplicating demo
+- **Reliability:** Message persistence, delivery guarantees, and automatic reconnection
+- **Standards-Based:** AMQP protocol with wide client support
+- **Management UI:** Built-in monitoring at http://localhost:15672 for message inspection
+- **Docker Integration:** Official Docker image with easy compose configuration
+- **Production Ready:** Battle-tested in high-throughput environments
+- **Decoupling:** Asynchronous event processing for downstream systems
+- **Scalability:** Supports clustering and message routing patterns
 
-**Production Ready Alternatives (Documented):**
-- **RabbitMQ:** Reliable message queueing with great .NET support
-- **Azure Service Bus:** Enterprise-grade, managed service
-- **Apache Kafka:** High throughput for event streaming
-- **AWS EventBridge:** Cloud-native event bus
+**Implementation Details:**
+- **Exchange:** `forecast.events` (topic exchange)
+- **Routing Key:** `position.changed`
+- **Connection:** Automatic reconnection with retry logic
+- **Message Format:** JSON serialized events
+- **Publisher:** `RabbitMqEventPublisher` in Infrastructure layer
 
 **Interface Design:**
 ```csharp
@@ -154,28 +162,37 @@ public interface IEventPublisher
 }
 ```
 
+**Alternative Options Considered:**
+- **In-Memory Publisher:** Simple but no inter-service communication
+- **Azure Service Bus:** Enterprise-grade but adds cloud dependency
+- **Apache Kafka:** High throughput but complex setup for this scope
+- **AWS EventBridge:** Cloud-native but vendor lock-in
+
 ---
 
 ## 8. API Design
 
-### Decision: RESTful API with OpenAPI/Swagger
+### Decision: RESTful API with Scalar (OpenAPI Documentation)
 **Rationale:**
 - **Industry Standard:** REST is universally understood and supported
 - **HTTP Semantics:** Proper use of status codes (200, 201, 400, 404, 500)
-- **Self-Documenting:** OpenAPI generates interactive documentation
+- **Modern Documentation:** Scalar provides a superior UI experience compared to Swagger
+- **OpenAPI 3.0:** Standards-compliant API specification
 - **Tooling:** Excellent client generation tools (TypeScript, C#, etc.)
-- **Idempotency:** PUT operations are naturally idempotent for updates
+- **Idempotency:** POST operations handle upsert logic gracefully
+- **.NET 10 Native:** Built-in OpenAPI support without Swashbuckle dependency
 
 **Endpoint Design Philosophy:**
 - Resource-based URLs (`/api/forecasts`, `/api/companyposition`)
 - Proper HTTP verbs (POST for create/update, GET for retrieval)
 - Query parameters for filtering (startDate, endDate)
-- Consistent response formats
-- Proper error handling with meaningful messages
+- **Result Pattern:** Consistent `isSuccess`, `value`, `error` response structure
+- Proper error handling with meaningful messages and error codes
 
 **Alternatives Considered:**
 - **GraphQL:** Flexible but overkill for this simple API
 - **gRPC:** Better performance but REST more accessible for demo
+- **Swagger UI:** Standard but Scalar offers better UX
 
 ---
 
@@ -199,35 +216,75 @@ public interface IEventPublisher
 
 ## 10. Data Validation & Error Handling
 
-### Decision: Multi-Layer Validation Strategy
+### Decision: Result Pattern with Multi-Layer Validation
 **Rationale:**
+- **Type Safety:** Explicit success/failure handling without exceptions
+- **Performance:** No exception overhead for business rule violations
+- **Functional Style:** Clear separation between success and error paths
 - **Controller Level:** Model validation using data annotations
 - **Service Level:** Business rule validation (e.g., negative production values)
 - **Database Level:** Constraints ensure data integrity
-- **Global Exception Handler:** Consistent error responses
+- **Consistent Errors:** Domain errors centralized in `DomainErrors` class
+
+**Result Pattern Implementation:**
+```csharp
+public record Result<T>
+{
+    public bool IsSuccess { get; init; }
+    public T? Value { get; init; }
+    public Error? Error { get; init; }
+}
+
+public record Error(string Code, string Message);
+```
 
 **Error Response Strategy:**
-- 400 Bad Request: Invalid input or business rule violations
-- 404 Not Found: Resource doesn't exist
-- 500 Internal Server Error: Unexpected errors (logged)
-- Meaningful error messages for debugging
+- **400 Bad Request:** Invalid input or business rule violations (domain errors)
+- **404 Not Found:** Resource doesn't exist
+- **409 Conflict:** Concurrency or constraint violations
+- **500 Internal Server Error:** Unexpected errors (logged)
+- **Meaningful Messages:** Error codes (e.g., `PowerPlant.NotFound`) and descriptions
+
+**Benefits:**
+- No try-catch blocks in controllers
+- Automatic HTTP status code mapping
+- Clear error propagation through layers
+- Easy to test success and error paths
 
 ---
 
 ## 11. Logging & Monitoring
 
-### Decision: Built-in ASP.NET Core Logging (Extensible)
+### Decision: Serilog for Structured Logging
 **Rationale:**
-- **Zero Configuration:** Works out of the box
-- **Structured Logging:** JSON format for log aggregation
-- **Multiple Outputs:** Console, file, Application Insights
-- **Log Levels:** Debug, Information, Warning, Error
-- **Extensible:** Easy to add Serilog or other providers
+- **Structured Logging:** Rich context with property-based logging
+- **Multiple Sinks:** Console (development) + File (persistent logs)
+- **Performance:** Efficient with minimal overhead
+- **Configuration:** Flexible via code and appsettings.json
+- **Request Logging:** HTTP request/response details with timing
+- **Log Enrichment:** Automatic context injection (timestamp, level, source)
 
-**Future Recommendations:**
-- Serilog for structured logging
+**Current Implementation:**
+- **Console Sink:** Real-time output during development with color coding
+- **File Sink:** Daily rolling logs in `logs/forecast-service-YYYYMMDD.log`
+- **Retention:** 30-day automatic cleanup
+- **Log Levels:** Debug (app), Information (Microsoft), Information (EF Core)
+- **Format:** Structured JSON-like output with context
+
+**Example Log Output:**
+```
+[2026-01-17 10:30:45 INF] ForecastService.Application.Services.ForecastService
+Creating forecast for PowerPlant: 22222222..., DateTime: 2026-01-18T10:00:00Z
+
+[2026-01-17 10:30:45 INF] ForecastService.Infrastructure.Events.RabbitMqEventPublisher
+Published Position Changed Event to RabbitMQ: CompanyId=11111111..., TotalPosition=850.5 MWh
+```
+
+**Future Enhancements:**
+- Correlation IDs for distributed request tracing
 - Application Insights or ELK stack for centralized logging
-- Distributed tracing with correlation IDs
+- Structured JSON sink for log aggregation
+- Performance metrics and custom event tracking
 
 ---
 
@@ -252,11 +309,13 @@ docker-compose up
 ## Summary
 
 The technology choices prioritize:
-1. ✅ **Production Readiness:** Enterprise-grade technologies
+1. ✅ **Production Readiness:** RabbitMQ, Serilog, Result Pattern, Docker
 2. ✅ **Maintainability:** Clean architecture with clear separation
 3. ✅ **Scalability:** Stateless design, containerization, async operations
-4. ✅ **Developer Experience:** Modern tooling, excellent debugging
-5. ✅ **Interview Alignment:** Meets all specified requirements
+4. ✅ **Developer Experience:** Modern tooling, Scalar API docs, structured logging
+5. ✅ **Interview Alignment:** Exceeds all specified requirements
 6. ✅ **Industry Best Practices:** Patterns used in real trading platforms
+7. ✅ **Error Handling:** Type-safe Result Pattern without exception overhead
+8. ✅ **Observability:** Serilog with multiple sinks, RabbitMQ management UI
 
-These decisions balance **pragmatism** (quick development for interview) with **professionalism** (production-ready architecture), demonstrating both technical competence and architectural maturity suitable for an energy trading platform microservice.
+These decisions balance **pragmatism** (efficient development) with **professionalism** (production-ready architecture), demonstrating both technical competence and architectural maturity suitable for an energy trading platform microservice. The implementation goes beyond basic requirements to showcase enterprise-grade patterns including event-driven architecture, structured logging, and functional error handling.

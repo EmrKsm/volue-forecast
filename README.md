@@ -3,7 +3,7 @@
 **Technical Assessment Submission for Volue SmartPulse**  
 **Author:** Emir Kesim
 **Date:** January 17, 2026  
-**Technology Stack:** .NET 10, PostgreSQL, RabbitMQ, Docker
+**Technology Stack:** .NET 10, C# 14, PostgreSQL, RabbitMQ, Docker
 
 ---
 
