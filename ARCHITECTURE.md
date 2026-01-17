@@ -390,20 +390,20 @@ flowchart LR
 
 **Implementation:**
 
-1. **field Keyword Usage:**
-   - BaseEntity: Backing field access for UTC timestamp normalization
-   - CreateOrUpdateForecastRequest: Inline validation with field keyword
-   - Cleaner code by eliminating explicit backing fields
+**field Keyword:**
+- **BaseEntity:** Backing field access for UTC timestamp normalization (CreatedAt, UpdatedAt)
+- **CreateOrUpdateForecastRequest:** Inline validation in property setter (ProductionMWh >= 0)
+- **Benefit:** Cleaner code by eliminating explicit backing fields while maintaining validation logic
 
-2. **Span<T> Optimizations:**
-   - BaseApiController: `ReadOnlySpan<char>` for zero-allocation error code comparisons
-   - RabbitMqEventPublisher: Stack allocation for message encoding and GUID formatting
-   - Performance benefits in high-throughput scenarios
+**Rationale for Limited C# 14 Usage:**
+- This is an **I/O-bound microservice** where network/database latency dominates performance
+- Event publishing happens **occasionally** (on forecast changes), not in tight loops
+- Premature optimization with `Span<T>` would add complexity without measurable benefits
+- **Principle:** Favor readability and maintainability over micro-optimizations
 
-**Benefits:**
-- Reduced memory allocations in hot paths
-- Cleaner property implementations with inline validation
-- Modern C# patterns for performance-critical operations
+**Features Considered but Not Used:**
+- ❌ **Extension Members:** Only replaced `Sum()` which is already concise (overengineering)
+- ❌ **Span<T> optimizations:** No performance bottlenecks in string operations or byte encoding
 
 ## 11. Technology Stack Summary
 

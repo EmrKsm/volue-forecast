@@ -1,7 +1,7 @@
 # Technology Decision Log
 
 ## Project: Forecast Service Microservice
-**Date:** January 16, 2026  
+**Date:** January 18, 2026  
 **Prepared for:** Volue SmartPulse Technical Interview
 
 ---
@@ -15,9 +15,14 @@
 - **Strong Typing:** C# 14 provides compile-time safety with latest language features
 - **Async-First:** Native async/await support for I/O-bound operations like database queries
 - **C# 14 Features Implemented:**
-  - `field` keyword for property backing field access in BaseEntity and DTOs
-  - `Span<T>` and `ReadOnlySpan<char>` for zero-allocation string operations
-  - Stack allocation optimizations for performance-critical paths
+  - **`field` keyword:** Used in BaseEntity and CreateOrUpdateForecastRequest for cleaner property implementations with backing field access
+  - Applied for UTC timestamp normalization and inline validation logic
+  - Eliminates need for explicit backing fields while maintaining encapsulation
+- **C# 14 Features Considered but Not Used:**
+  - **Extension Members:** Removed - only replaced `Sum()` which is already concise (overengineering)
+  - **`Span<T>` optimizations:** Removed - this is an I/O-bound microservice where network/database latency dominates CPU/memory performance
+  - Event publishing happens occasionally, not in tight loops requiring micro-optimizations
+  - **Principle:** Prefer readability and maintainability over premature optimization
 - **Enterprise Ready:** Widely adopted in the energy and trading sectors
 - **Long-term Support:** Microsoft provides excellent support and regular updates
 
