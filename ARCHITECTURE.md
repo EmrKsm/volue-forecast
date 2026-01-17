@@ -117,8 +117,8 @@ Create or update a forecast for a power plant.
 **Response (201 Created / 200 OK):**
 ```json
 {
-  "isSuccess": true,
-  "value": {
+  "success": true,
+  "data": {
     "id": "guid",
     "powerPlantId": "guid",
     "powerPlantName": "Turkey Power Plant",
@@ -135,11 +135,14 @@ Create or update a forecast for a power plant.
 **Error Response (400 Bad Request / 404 Not Found):**
 ```json
 {
-  "isSuccess": false,
-  "value": null,
+  "success": false,
+  "data": null,
   "error": {
-    "code": "PowerPlant.NotFound",
-    "message": "Power plant with ID ... not found"
+    "title": "Not Found",
+    "detail": "Power plant with ID ... not found",
+    "status": 404,
+    "instance": "/api/forecasts",
+    "timestamp": "2026-01-18T10:30:00Z"
   }
 }
 ```
@@ -166,8 +169,8 @@ Calculate and retrieve the aggregated position for a company.
 **Response:**
 ```json
 {
-  "isSuccess": true,
-  "value": {
+  "success": true,
+  "data": {
     "companyId": "guid",
     "companyName": "Energy Trading Corp",
     "startDate": "2026-01-16T00:00:00Z",

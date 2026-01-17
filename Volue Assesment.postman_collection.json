@@ -1,0 +1,172 @@
+{
+  "info": {
+    "_postman_id": "270e0683-6fd7-487c-8d05-033ddf203413",
+    "name": "Volue Assesment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3877382",
+    "_collection_link": "https://go.postman.co/collection/3877382-270e0683-6fd7-487c-8d05-033ddf203413?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Forecast",
+      "item": [
+        {
+          "name": "Get forecast",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URI}}/api/Forecasts/{{id}}",
+              "host": [
+                "{{URI}}"
+              ],
+              "path": [
+                "api",
+                "Forecasts",
+                "{{id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get power plant forecast",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URI}}/api/Forecasts/power-plant/{{BulgariaPlantID}}?startDate=2025-01-01T10:00:00Z&endDate=2025-01-30T10:00:00Z",
+              "host": [
+                "{{URI}}"
+              ],
+              "path": [
+                "api",
+                "Forecasts",
+                "power-plant",
+                "{{BulgariaPlantID}}"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01T10:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-01-30T10:00:00Z"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create/Update forecast",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"powerPlantId\" : \"{{BulgariaPlantID}}\",\r\n    \"forecastDateTime\" : \"2025-01-03T10:00:00Z\",\r\n    \"productionMWh\" : 1150.5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URI}}/api/Forecasts",
+              "host": [
+                "{{URI}}"
+              ],
+              "path": [
+                "api",
+                "Forecasts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Company Position",
+      "item": [
+        {
+          "name": "Get position",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{URI}}/api/CompanyPosition/{{CompanyID}}?startDate=2025-01-01T00:00:00Z&endDate=2026-12-31T23:59:59Z",
+              "host": [
+                "{{URI}}"
+              ],
+              "path": [
+                "api",
+                "CompanyPosition",
+                "{{CompanyID}}"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-12-31T23:59:59Z"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "URI",
+      "value": ""
+    },
+    {
+      "key": "SpainPlantID",
+      "value": ""
+    },
+    {
+      "key": "TurkeyPlantID",
+      "value": ""
+    },
+    {
+      "key": "BulgariaPlantID",
+      "value": ""
+    },
+    {
+      "key": "CompanyID",
+      "value": ""
+    }
+  ]
+}

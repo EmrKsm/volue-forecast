@@ -9,13 +9,13 @@
 
 ## 📋 Executive Summary
 
-This is a production-ready microservice for managing power plant production forecasts in an energy trading platform. Built with Clean Architecture principles, it demonstrates enterprise-grade design patterns, modern .NET development practices, and operational readiness for containerized deployments.
+This is a microservice for managing power plant production forecasts in an energy trading platform. Built with Clean Architecture principles, it demonstrates enterprise-grade design patterns, modern .NET development practices, and containerized deployment capabilities.
 
 ### Core Capabilities
 - **Forecast Management:** Create and update hourly production forecasts for power plants
 - **Position Aggregation:** Calculate company-wide position across multiple plants and countries
 - **Event-Driven Architecture:** Emit position change events to RabbitMQ for downstream systems
-- **Production-Ready:** Structured logging, error handling, optimized queries, Docker deployment
+- **Enterprise Features:** Structured logging, error handling, optimized queries, Docker deployment
 
 ### Key Features Implemented
 - 🏗️ **Clean Architecture** - 4-layer separation (API, Application, Domain, Infrastructure)
@@ -234,8 +234,8 @@ Content-Type: application/json
 **Response (201 Created):**
 ```json
 {
-  "isSuccess": true,
-  "value": {
+  "success": true,
+  "data": {
     "id": "f3e7a8b9-4c2d-4e1f-9a6b-7d8c3e5f2a1b",
     "powerPlantId": "22222222-2222-2222-2222-222222222222",
     "powerPlantName": "Turkey Power Plant",
@@ -265,8 +265,8 @@ GET /api/companyposition/11111111-1111-1111-1111-111111111111?startDate=2026-01-
 **Response (200 OK):**
 ```json
 {
-  "isSuccess": true,
-  "value": {
+  "success": true,
+  "data": {
     "companyId": "11111111-1111-1111-1111-111111111111",
     "companyName": "Energy Trading Corp",
     "startDate": "2026-01-17T00:00:00Z",
@@ -307,11 +307,14 @@ The API uses the **Result Pattern** for consistent error responses:
 **Example Error Response (400 Bad Request):**
 ```json
 {
-  "isSuccess": false,
-  "value": null,
+  "success": false,
+  "data": null,
   "error": {
-    "code": "PowerPlant.NotFound",
-    "message": "Power plant with ID 12345678-1234-1234-1234-123456789012 not found"
+    "title": "Validation Error",
+    "detail": "Power plant with ID 12345678-1234-1234-1234-123456789012 not found",
+    "status": 404,
+    "instance": "/api/forecasts",
+    "timestamp": "2026-01-18T10:30:45Z"
   }
 }
 ```
@@ -429,7 +432,7 @@ Monitor event publishing in real-time:
 
 ---
 
-## 🔧 Production Readiness Features
+## 🔧 Technical Features
 
 ### Performance Optimizations
 

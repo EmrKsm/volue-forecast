@@ -69,6 +69,13 @@
 - **Enterprise Adoption:** Widely used in trading and energy sectors
 - **Docker Support:** Official Docker images with excellent documentation
 
+**Azure Cloud Considerations:**
+- **Azure Database for PostgreSQL:** Fully managed service with automatic backups, patching, and HA
+- **Cost Efficiency:** Pay-per-use pricing with Burstable tier for development (~$15-30/month), General Purpose for production
+- **Scalability:** Vertical scaling (vCores/memory) and horizontal read replicas without code changes
+- **Flexible Server:** Best balance of features, performance, and cost in Azure
+- **vs Azure SQL:** PostgreSQL offers lower licensing costs and open-source flexibility
+
 **Alternatives Considered:**
 - **SQL Server:** Excellent but expensive licensing for microservices
 - **MySQL:** Good but PostgreSQL has better feature set for complex queries
@@ -123,7 +130,7 @@
 - **Environment Consistency:** Same runtime everywhere (dev, test, prod)
 - **Easy Setup:** Single command to start entire application stack
 - **Isolation:** Database and API run in separate containers
-- **Production Ready:** Docker is industry standard for microservices
+- **Industry Standard:** Docker is widely used for microservices
 - **Orchestration Ready:** Easy migration to Kubernetes if needed
 - **Multi-Stage Builds:** Optimized image sizes (SDK for build, Runtime for deployment)
 
@@ -132,6 +139,17 @@
 - Health checks ensure database is ready before API starts
 - Persistent volumes for database data
 - Easy networking between containers
+
+**Azure Cloud Deployment Options:**
+- **Azure Container Apps:** Serverless containers with auto-scaling, pay-per-use (~$0.000012/vCPU-second)
+  - Cost-effective for variable workloads, scales to zero when idle
+  - Built-in ingress, HTTPS, and microservices patterns
+- **Azure Kubernetes Service (AKS):** Full Kubernetes orchestration for complex workloads
+  - More control but higher operational overhead
+  - Cost: ~$72/month for basic cluster + per-node charges
+- **Azure Container Instances (ACI):** Simple container hosting
+  - Lower cost for simple scenarios but limited features
+- **Recommendation:** Start with Container Apps for cost efficiency, migrate to AKS if complex orchestration needed
 
 **Alternatives Considered:**
 - **Virtual Machines:** Too heavy, slower startup
@@ -148,9 +166,31 @@
 - **Standards-Based:** AMQP protocol with wide client support
 - **Management UI:** Built-in monitoring at http://localhost:15672 for message inspection
 - **Docker Integration:** Official Docker image with easy compose configuration
-- **Production Ready:** Battle-tested in high-throughput environments
+- **Battle-Tested:** Proven in high-throughput environments
 - **Decoupling:** Asynchronous event processing for downstream systems
 - **Scalability:** Supports clustering and message routing patterns
+
+**Azure Cloud Alternatives & Cost Comparison:**
+- **Azure Service Bus (Recommended for Azure):**
+  - Fully managed, no infrastructure management
+  - Cost: Standard tier ~$10/month base + $0.05 per million operations
+  - Enterprise features: Dead letter queues, duplicate detection, sessions
+  - Better integration with Azure services (Managed Identity, Key Vault)
+  - Lower operational overhead compared to self-hosted RabbitMQ
+
+- **Self-Hosted RabbitMQ on Azure Container Apps:**
+  - More control but requires monitoring and maintenance
+  - Cost: Container hosting ~$20-40/month + storage
+  - Good for AMQP compatibility requirements
+
+- **Azure Event Grid:**
+  - Serverless event routing, pay-per-event ($0.60 per million operations)
+  - Best for event-driven architectures with multiple subscribers
+  - Limited to push-based delivery (no pull/polling)
+
+**Trade-offs:**
+- RabbitMQ chosen for demo: portable, self-contained, no cloud dependency
+- Azure Service Bus recommended for production: managed service, lower TCO, enterprise features
 
 **Implementation Details:**
 - **Exchange:** `forecast.events` (topic exchange)
@@ -169,7 +209,6 @@ public interface IEventPublisher
 
 **Alternative Options Considered:**
 - **In-Memory Publisher:** Simple but no inter-service communication
-- **Azure Service Bus:** Enterprise-grade but adds cloud dependency
 - **Apache Kafka:** High throughput but complex setup for this scope
 - **AWS EventBridge:** Cloud-native but vendor lock-in
 
@@ -191,7 +230,7 @@ public interface IEventPublisher
 - Resource-based URLs (`/api/forecasts`, `/api/companyposition`)
 - Proper HTTP verbs (POST for create/update, GET for retrieval)
 - Query parameters for filtering (startDate, endDate)
-- **Result Pattern:** Consistent `isSuccess`, `value`, `error` response structure
+- **ApiResult Pattern:** Consistent `success`, `data`, `error` response structure
 - Proper error handling with meaningful messages and error codes
 
 **Alternatives Considered:**
@@ -314,13 +353,13 @@ docker-compose up
 ## Summary
 
 The technology choices prioritize:
-1. ✅ **Production Readiness:** RabbitMQ, Serilog, Result Pattern, Docker
-2. ✅ **Maintainability:** Clean architecture with clear separation
-3. ✅ **Scalability:** Stateless design, containerization, async operations
-4. ✅ **Developer Experience:** Modern tooling, Scalar API docs, structured logging
-5. ✅ **Interview Alignment:** Exceeds all specified requirements
-6. ✅ **Industry Best Practices:** Patterns used in real trading platforms
-7. ✅ **Error Handling:** Type-safe Result Pattern without exception overhead
-8. ✅ **Observability:** Serilog with multiple sinks, RabbitMQ management UI
+1. **Enterprise Patterns:** RabbitMQ, Serilog, Result Pattern, Docker
+2. **Maintainability:** Clean architecture with clear separation
+3. **Scalability:** Stateless design, containerization, async operations
+4. **Developer Experience:** Modern tooling, Scalar API docs, structured logging
+5. **Interview Alignment:** Exceeds all specified requirements
+6. **Industry Best Practices:** Patterns used in real trading platforms
+7. **Error Handling:** Type-safe Result Pattern without exception overhead
+8. **Observability:** Serilog with multiple sinks, RabbitMQ management UI
 
-These decisions balance **pragmatism** (efficient development) with **professionalism** (production-ready architecture), demonstrating both technical competence and architectural maturity suitable for an energy trading platform microservice. The implementation goes beyond basic requirements to showcase enterprise-grade patterns including event-driven architecture, structured logging, and functional error handling.
+These decisions balance **pragmatism** (efficient development) with **professionalism** (enterprise architecture), demonstrating both technical competence and architectural maturity suitable for an energy trading platform microservice. The implementation goes beyond basic requirements to showcase enterprise-grade patterns including event-driven architecture, structured logging, and functional error handling.
