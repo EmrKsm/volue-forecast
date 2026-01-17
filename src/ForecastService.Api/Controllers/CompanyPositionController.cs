@@ -1,6 +1,7 @@
 using ForecastService.Application.DTOs;
 using ForecastService.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ForecastService.Api.Controllers;
 
@@ -17,11 +18,11 @@ public class CompanyPositionController(ICompanyPositionService companyPositionSe
     [ProducesResponseType(typeof(ApiResult<CompanyPositionResponse>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult<CompanyPositionResponse>), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResult<CompanyPositionResponse>>> GetCompanyPosition(
-        Guid companyId,
-        [FromQuery] DateTime startDate,
-        [FromQuery] DateTime endDate)
+        [Required(ErrorMessage = "Company ID is required")] Guid? companyId,
+        [FromQuery, Required(ErrorMessage = "Start date is required")] DateTime? startDate,
+        [FromQuery, Required(ErrorMessage = "End date is required")] DateTime? endDate)
     {
-        var result = await companyPositionService.GetCompanyPositionAsync(companyId, startDate, endDate);
+        var result = await companyPositionService.GetCompanyPositionAsync(companyId!.Value, startDate!.Value, endDate!.Value);
 
         if (result.IsFailure)
         {

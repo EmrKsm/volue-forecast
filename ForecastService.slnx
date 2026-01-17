@@ -5,4 +5,8 @@
     <Project Path="src/ForecastService.Domain/ForecastService.Domain.csproj" />
     <Project Path="src/ForecastService.Infrastructure/ForecastService.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ForecastService.Application.Tests/ForecastService.Application.Tests.csproj" />
+    <Project Path="tests/ForecastService.Api.Tests/ForecastService.Api.Tests.csproj" />
+  </Folder>
 </Solution>

@@ -33,7 +33,28 @@ public class GlobalExceptionHandlerMiddleware(
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        
+        // Determine status code and error details based on exception type
+        var (statusCode, title, detail) = exception switch
+        {
+            ArgumentNullException argNullEx => (
+                HttpStatusCode.BadRequest,
+                "Validation Error",
+                argNullEx.Message
+            ),
+            ArgumentException argEx => (
+                HttpStatusCode.BadRequest,
+                "Validation Error",
+                argEx.Message
+            ),
+            _ => (
+                HttpStatusCode.InternalServerError,
+                "Internal Server Error",
+                "An error occurred while processing your request. Please try again later."
+            )
+        };
+
+        context.Response.StatusCode = (int)statusCode;
 
         var response = new
         {
@@ -41,8 +62,8 @@ public class GlobalExceptionHandlerMiddleware(
             data = (object?)null,
             error = new
             {
-                title = "Internal Server Error",
-                detail = "An error occurred while processing your request. Please try again later.",
+                title,
+                detail,
                 status = context.Response.StatusCode,
                 instance = context.Request.Path.ToString(),
                 timestamp = DateTime.UtcNow.ToString("O")

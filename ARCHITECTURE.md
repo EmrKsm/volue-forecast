@@ -319,8 +319,9 @@ Initial data includes:
 
 ### 8.1 Current Implementation
 - **Result Pattern:** Type-safe error handling without exceptions
-- **Input validation:** Data annotations and FluentValidation-ready
-- **Model validation:** Automatic validation in controllers
+- **Model State Validation:** Nullable properties with `[Required]` and `[Range]` attributes
+- **Global Exception Handler:** Middleware for consistent error responses
+- **Custom Validation Error Factory:** Returns unified error format for validation failures
 - **Structured error responses:** Consistent error format with codes and messages
 - **CORS configuration:** Configured for cross-origin requests
 - **Docker isolation:** Services isolated in separate containers
@@ -389,24 +390,32 @@ flowchart LR
 - **Log format:** JSON structured format with timestamps, log levels, and context
 - **Future Enhancement:** Correlation IDs for distributed request tracing
 
-### 10.2 C# 14 Language Features
+### 10.2 Modern C# Features
 
-**Implementation:**
+**C# 14 field Keyword (Limited Usage):**
+- **BaseEntity only:** Used for UTC timestamp normalization in CreatedAt and UpdatedAt properties
+- **Benefit:** Cleaner code by eliminating explicit backing fields for date normalization logic
+- **Example:** `set => field = value.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(value, DateTimeKind.Utc) : value.ToUniversalTime();`
 
-**field Keyword:**
-- **BaseEntity:** Backing field access for UTC timestamp normalization (CreatedAt, UpdatedAt)
-- **CreateOrUpdateForecastRequest:** Inline validation in property setter (ProductionMWh >= 0)
-- **Benefit:** Cleaner code by eliminating explicit backing fields while maintaining validation logic
+**Validation Strategy - Data Annotations (ASP.NET Core Standard):**
+- **Approach:** Nullable properties with `[Required]` and `[Range]` data annotations
+- **Rationale:** 
+  - Data annotations are the ASP.NET Core idiomatic way for input validation
+  - Automatic validation before controller action execution
+  - Consistent error responses through custom `InvalidModelStateResponseFactory`
+  - Separates validation concerns from business logic
+  - No exceptions during model binding - validation handled declaratively
 
-**Rationale for Limited C# 14 Usage:**
+**Rationale for Pragmatic Approach:**
 - This is an **I/O-bound microservice** where network/database latency dominates performance
 - Event publishing happens **occasionally** (on forecast changes), not in tight loops
-- Premature optimization with `Span<T>` would add complexity without measurable benefits
-- **Principle:** Favor readability and maintainability over micro-optimizations
+- Advanced C# 14 features like `Span<T>` would add complexity without measurable benefits
+- **Principle:** Favor readability, maintainability, and ASP.NET Core conventions over micro-optimizations
 
-**Features Considered but Not Used:**
+**C# 14 Features Evaluated but Not Used:**
 - ❌ **Extension Members:** Only replaced `Sum()` which is already concise (overengineering)
 - ❌ **Span<T> optimizations:** No performance bottlenecks in string operations or byte encoding
+- ❌ **field keyword for validation:** Data Annotations provide better separation of concerns
 
 ## 11. Technology Stack Summary
 

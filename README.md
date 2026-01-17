@@ -3,7 +3,7 @@
 **Technical Assessment Submission for Volue SmartPulse**  
 **Author:** Emir Kesim  
 **Date:** January 18, 2026  
-**Technology Stack:** .NET 10, C# 14, PostgreSQL, RabbitMQ, Docker
+**Technology Stack:** .NET 10, PostgreSQL, RabbitMQ, Docker
 
 ---
 
@@ -302,15 +302,37 @@ GET /api/companyposition/11111111-1111-1111-1111-111111111111?startDate=2026-01-
 
 ### Error Handling
 
-The API uses the **Result Pattern** for consistent error responses:
+The API uses the **Result Pattern** combined with **ASP.NET Core Model State Validation** for consistent error responses:
 
-**Example Error Response (400 Bad Request):**
+**Model Validation Errors (400 Bad Request):**
+
+All request properties are validated using Data Annotations:
+- `[Required]` - Ensures properties are not null or missing
+- `[Range]` - Validates numeric values are within acceptable bounds
+- Custom error messages for clear client feedback
+
+**Example Validation Error Response:**
 ```json
 {
   "success": false,
   "data": null,
   "error": {
     "title": "Validation Error",
+    "detail": "Power plant ID is required; Production value is required",
+    "status": 400,
+    "instance": "/api/forecasts",
+    "timestamp": "2026-01-18T10:30:45Z"
+  }
+}
+```
+
+**Example Business Error Response (404 Not Found):**
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "title": "Not Found",
     "detail": "Power plant with ID 12345678-1234-1234-1234-123456789012 not found",
     "status": 404,
     "instance": "/api/forecasts",
@@ -320,7 +342,8 @@ The API uses the **Result Pattern** for consistent error responses:
 ```
 
 **Error Categories:**
-- **Domain Errors (4xx):** Business rule violations, validation failures
+- **Validation Errors (400):** Missing required fields, invalid data formats, range violations
+- **Domain Errors (404):** Business rule violations, resource not found
 - **Concurrency Errors (409):** Optimistic concurrency conflicts
 - **Database Errors (5xx):** Infrastructure issues, timeouts
 
@@ -455,6 +478,12 @@ Monitor event publishing in real-time:
 - Type-safe error propagation
 - Automatic HTTP status code mapping
 
+**Model State Validation:**
+- Nullable properties with `[Required]` attributes ensure required fields
+- `[Range]` attributes validate numeric boundaries
+- Custom `InvalidModelStateResponseFactory` returns consistent error format
+- All validation errors return 400 Bad Request with descriptive messages
+
 **Concurrency Handling:**
 - Optimistic concurrency with EF Core row versions
 - `DbUpdateConcurrencyException` → 409 Conflict
@@ -485,10 +514,13 @@ Monitor event publishing in real-time:
 
 ### Security Considerations
 
+**Security Considerations:**
+
 **Current Implementation:**
-- Input validation on all endpoints
+- Data Annotations validation with nullable types for required field enforcement
 - SQL injection protection (parameterized queries)
 - CORS configured (customizable per environment)
+- Global exception handler middleware for consistent error responses
 
 **Production Recommendations:**
 - Add JWT authentication

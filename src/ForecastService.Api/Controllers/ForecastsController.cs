@@ -1,6 +1,7 @@
 using ForecastService.Application.DTOs;
 using ForecastService.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ForecastService.Api.Controllers;
 
@@ -49,9 +50,10 @@ public class ForecastsController(IForecastService forecastService) : BaseApiCont
     [ProducesResponseType(typeof(ApiResult<ForecastResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResult<ForecastResponse>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResult<ForecastResponse>), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<ApiResult<ForecastResponse>>> GetForecast(Guid id)
+    public async Task<ActionResult<ApiResult<ForecastResponse>>> GetForecast(
+        [Required(ErrorMessage = "Forecast ID is required")] Guid? id)
     {
-        var result = await forecastService.GetForecastAsync(id);
+        var result = await forecastService.GetForecastAsync(id!.Value);
 
         if (result.IsFailure)
         {
@@ -69,11 +71,11 @@ public class ForecastsController(IForecastService forecastService) : BaseApiCont
     [ProducesResponseType(typeof(ApiResult<IEnumerable<ForecastResponse>>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResult<IEnumerable<ForecastResponse>>), StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ApiResult<IEnumerable<ForecastResponse>>>> GetForecastsByPowerPlant(
-        Guid powerPlantId,
-        [FromQuery] DateTime startDate,
-        [FromQuery] DateTime endDate)
+        [Required(ErrorMessage = "Power plant ID is required")] Guid? powerPlantId,
+        [FromQuery, Required(ErrorMessage = "Start date is required")] DateTime? startDate,
+        [FromQuery, Required(ErrorMessage = "End date is required")] DateTime? endDate)
     {
-        var result = await forecastService.GetForecastsByPowerPlantAsync(powerPlantId, startDate, endDate);
+        var result = await forecastService.GetForecastsByPowerPlantAsync(powerPlantId!.Value, startDate!.Value, endDate!.Value);
 
         if (result.IsFailure)
         {

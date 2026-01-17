@@ -18,22 +18,22 @@ public class ForecastService(
     public async Task<Result<ForecastResponse>> CreateOrUpdateForecastAsync(CreateOrUpdateForecastRequest request)
     {
         // Validate power plant exists
-        var powerPlant = await powerPlantRepository.GetByIdAsync(request.PowerPlantId);
+        var powerPlant = await powerPlantRepository.GetByIdAsync(request.PowerPlantId!.Value);
         if (powerPlant == null)
         {
-            return Result.Failure<ForecastResponse>(PowerPlantErrors.NotFound(request.PowerPlantId));
+            return Result.Failure<ForecastResponse>(PowerPlantErrors.NotFound(request.PowerPlantId!.Value));
         }
 
-        // Validate production value
-        if (request.ProductionMWh < 0)
+        // Validate production value (Range attribute already handles this, but keep for safety)
+        if (request.ProductionMWh!.Value < 0)
         {
             return Result.Failure<ForecastResponse>(ForecastErrors.NegativeProduction);
         }
 
         // Check if forecast already exists for this power plant and datetime
         var existingForecast = await forecastRepository.GetByPowerPlantAndDateTimeAsync(
-            request.PowerPlantId,
-            request.ForecastDateTime);
+            request.PowerPlantId!.Value,
+            request.ForecastDateTime!.Value);
 
         Forecast forecast;
         bool isUpdate = false;
@@ -43,7 +43,7 @@ public class ForecastService(
             if (existingForecast != null)
             {
                 // Update existing forecast
-                existingForecast.ProductionMWh = request.ProductionMWh;
+                existingForecast.ProductionMWh = request.ProductionMWh!.Value;
                 existingForecast.UpdatedAt = DateTime.UtcNow;
                 forecast = await forecastRepository.UpdateAsync(existingForecast);
                 isUpdate = true;
@@ -54,9 +54,9 @@ public class ForecastService(
                 forecast = new Forecast
                 {
                     Id = Guid.NewGuid(),
-                    PowerPlantId = request.PowerPlantId,
-                    ForecastDateTime = request.ForecastDateTime,
-                    ProductionMWh = request.ProductionMWh,
+                    PowerPlantId = request.PowerPlantId!.Value,
+                    ForecastDateTime = request.ForecastDateTime!.Value,
+                    ProductionMWh = request.ProductionMWh!.Value,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
@@ -76,13 +76,13 @@ public class ForecastService(
             {
                 return Result.Failure<ForecastResponse>(DatabaseErrors.UniqueConstraintViolation);
             }
-            
+
             if (ex.InnerException?.Message.Contains("foreign key", StringComparison.OrdinalIgnoreCase) == true ||
                 ex.InnerException?.Message.Contains("violates foreign key", StringComparison.OrdinalIgnoreCase) == true)
             {
                 return Result.Failure<ForecastResponse>(DatabaseErrors.ForeignKeyViolation);
             }
-            
+
             return Result.Failure<ForecastResponse>(ForecastErrors.DatabaseError);
         }
         catch (TimeoutException)

@@ -12,17 +12,18 @@
 **Rationale:**
 - **Modern Performance:** .NET 10 offers excellent performance with minimal allocations and high throughput
 - **Cross-Platform:** Runs on Windows, Linux, and macOS, perfect for containerized deployments
-- **Strong Typing:** C# 14 provides compile-time safety with latest language features
+- **Strong Typing:** C# provides compile-time safety with latest language features
 - **Async-First:** Native async/await support for I/O-bound operations like database queries
-- **C# 14 Features Implemented:**
-  - **`field` keyword:** Used in BaseEntity and CreateOrUpdateForecastRequest for cleaner property implementations with backing field access
-  - Applied for UTC timestamp normalization and inline validation logic
-  - Eliminates need for explicit backing fields while maintaining encapsulation
-- **C# 14 Features Considered but Not Used:**
-  - **Extension Members:** Removed - only replaced `Sum()` which is already concise (overengineering)
-  - **`Span<T>` optimizations:** Removed - this is an I/O-bound microservice where network/database latency dominates CPU/memory performance
+- **Modern C# Features (Pragmatic Usage):**
+  - **`field` keyword:** Used in BaseEntity only for UTC timestamp normalization
+  - Applied to CreatedAt and UpdatedAt properties to eliminate explicit backing fields
+  - Limited scope - not used for validation (Data Annotations preferred)
+- **C# 14 Features Evaluated but Not Used:**
+  - **Extension Members:** Only replaced `Sum()` which is already concise (overengineering)
+  - **`Span<T>` optimizations:** This is an I/O-bound microservice where network/database latency dominates
+  - **`field` keyword for validation:** Data Annotations provide better separation of concerns and ASP.NET Core integration
   - Event publishing happens occasionally, not in tight loops requiring micro-optimizations
-  - **Principle:** Prefer readability and maintainability over premature optimization
+  - **Principle:** Prefer readability, maintainability, and framework conventions over premature optimization
 - **Enterprise Ready:** Widely adopted in the energy and trading sectors
 - **Long-term Support:** Microsoft provides excellent support and regular updates
 
@@ -333,7 +334,98 @@ Published Position Changed Event to RabbitMQ: CompanyId=11111111..., TotalPositi
 
 ---
 
-## 12. Development & Deployment
+## 12. Input Validation Strategy
+
+### Decision: ASP.NET Core Data Annotations with Nullable Types
+**Rationale:**
+- **Framework Integration:** Automatic validation before controller action execution
+- **Declarative Approach:** Clear, readable validation rules on properties
+- **Consistent Error Format:** Custom `InvalidModelStateResponseFactory` for uniform responses
+- **Type Safety:** Nullable value types (`Guid?`, `DateTime?`, `decimal?`) with `[Required]` ensure proper validation
+- **Separation of Concerns:** Validation logic separate from business logic and property setters
+- **Standard Pattern:** Industry-standard ASP.NET Core approach
+
+**Implementation:**
+```csharp
+// DTOs with nullable properties and validation attributes
+public class CreateOrUpdateForecastRequest
+{
+    [Required(ErrorMessage = "Power plant ID is required")]
+    public Guid? PowerPlantId { get; set; }
+
+    [Required(ErrorMessage = "Forecast date and time is required")]
+    public DateTime? ForecastDateTime { get; set; }
+
+    [Required(ErrorMessage = "Production value is required")]
+    [Range(0, double.MaxValue, ErrorMessage = "Production value must be non-negative")]
+    public decimal? ProductionMWh { get; set; }
+}
+
+// Controller parameters also validated
+public async Task<ActionResult> GetForecast(
+    [Required(ErrorMessage = "Forecast ID is required")] Guid? id)
+```
+
+**Custom Error Response Configuration:**
+```csharp
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .SelectMany(e => e.Value!.Errors)
+                .Select(e => e.ErrorMessage);
+
+            return new BadRequestObjectResult(new {
+                success = false,
+                data = null,
+                error = new {
+                    title = "Validation Error",
+                    detail = string.Join("; ", errors),
+                    status = 400,
+                    instance = context.HttpContext.Request.Path,
+                    timestamp = DateTime.UtcNow
+                }
+            });
+        };
+    });
+```
+
+**Evolution from Initial Approach:**
+- **Initial:** Used C# 14 `field` keyword with `ArgumentException` in property setters
+- **Problem:** Exceptions thrown during model binding before middleware could catch them
+- **Solution:** Nullable types with Data Annotations - validated automatically by ASP.NET Core
+- **Benefits:** 
+  - No custom middleware needed for validation errors
+  - Consistent with ASP.NET Core conventions
+  - Clear separation: validation (annotations) vs domain logic (services)
+  - Better error messages returned as 400 Bad Request, not 500 Internal Server Error
+
+**Error Response Format:**
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "title": "Validation Error",
+    "detail": "Power plant ID is required; Production value must be non-negative",
+    "status": 400,
+    "instance": "/api/forecasts",
+    "timestamp": "2026-01-18T10:30:45Z"
+  }
+}
+```
+
+**Alternatives Considered:**
+- **FluentValidation:** More powerful but unnecessary for simple validation rules
+- **Custom Middleware:** Catches exceptions but validation should happen earlier in pipeline
+- **Field Keyword Validation:** Elegant but throws during model binding, inconsistent HTTP status codes
+
+---
+
+## 13. Development & Deployment
 
 ### Decision: Visual Studio Code-Friendly with .NET CLI
 **Rationale:**
