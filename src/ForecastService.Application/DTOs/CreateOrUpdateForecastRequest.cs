@@ -10,7 +10,17 @@ public class CreateOrUpdateForecastRequest
     [Required(ErrorMessage = "Forecast date and time is required")]
     public DateTime? ForecastDateTime { get; set; }
 
+    private decimal? _productionMWh;
     [Required(ErrorMessage = "Production value is required")]
     [Range(0, double.MaxValue, ErrorMessage = "Production value must be non-negative")]
-    public decimal? ProductionMWh { get; set; }
+    public decimal? ProductionMWh
+    {
+        get => _productionMWh;
+        set
+        {
+            if (value < 0)
+                throw new ArgumentException("Production value cannot be negative", nameof(ProductionMWh));
+            _productionMWh = value;
+        }
+    }
 }

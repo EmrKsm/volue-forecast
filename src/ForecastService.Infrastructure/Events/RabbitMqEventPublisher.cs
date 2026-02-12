@@ -12,7 +12,6 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
 {
     private readonly ILogger<RabbitMqEventPublisher> _logger;
     private readonly IConnection _connection;
-    private readonly IChannel _channel;
     private readonly string _exchangeName = "forecast.events";
     private readonly string _routingKey = "position.changed";
 
@@ -38,10 +37,10 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
         try
         {
             _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
-            _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+            using var channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
 
             // Declare a topic exchange
-            _channel.ExchangeDeclareAsync(
+            channel.ExchangeDeclareAsync(
                 exchange: _exchangeName,
                 type: ExchangeType.Topic,
                 durable: true,
@@ -62,6 +61,10 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
     {
         try
         {
+            await using var channel = await _connection.CreateChannelAsync(new CreateChannelOptions(
+                publisherConfirmationsEnabled: true,
+                publisherConfirmationTrackingEnabled: true));
+
             var message = JsonSerializer.Serialize(eventData, new JsonSerializerOptions
             {
                 WriteIndented = false,
@@ -79,10 +82,10 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
                 Type = nameof(PositionChangedEvent)
             };
 
-            await _channel.BasicPublishAsync(
+            await channel.BasicPublishAsync(
                 exchange: _exchangeName,
                 routingKey: _routingKey,
-                mandatory: false,
+                mandatory: true,
                 basicProperties: properties,
                 body: body);
 
@@ -101,7 +104,6 @@ public class RabbitMqEventPublisher : IEventPublisher, IDisposable
 
     public void Dispose()
     {
-        _channel?.Dispose();
         _connection?.Dispose();
     }
 }
